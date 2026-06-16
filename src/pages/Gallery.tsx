@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 import { Loader2, Maximize2, X, Image as ImageIcon } from 'lucide-react';
 
 interface GalleryItem {
@@ -17,7 +18,7 @@ export const Gallery: React.FC = () => {
   useEffect(() => {
     const fetchGallery = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/gallery');
+        const res = await fetch(`${API_URL}/api/gallery`);
         if (res.ok) {
           const json = await res.json();
           if (json.success) {

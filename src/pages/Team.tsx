@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 import {
   Mail,
   Phone,
@@ -7,8 +8,7 @@ import {
   X,
   Users,
   Briefcase,
-  ShieldCheck,
-  Calendar
+  ShieldCheck
 } from 'lucide-react';
 
 interface Employee {
@@ -30,7 +30,7 @@ export const Team: React.FC = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/employees');
+        const res = await fetch(`${API_URL}/api/employees`);
         if (res.ok) {
           const json = await res.json();
           if (json.success) {

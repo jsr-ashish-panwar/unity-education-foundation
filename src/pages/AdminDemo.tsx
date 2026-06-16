@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 import { 
   Database, 
   AlertCircle, 
@@ -113,7 +114,7 @@ export const AdminDemo: React.FC = () => {
 
     // Fetch from Express API
     try {
-      const statusRes = await fetch('http://localhost:5000/api/status');
+      const statusRes = await fetch(`${API_URL}/api/status`);
       if (statusRes.ok) {
         const statusJson = await statusRes.json();
         setDbStatus({
@@ -122,7 +123,7 @@ export const AdminDemo: React.FC = () => {
           message: statusJson.message
         });
 
-        const contactsRes = await fetch('http://localhost:5000/api/contacts');
+        const contactsRes = await fetch(`${API_URL}/api/contacts`);
         if (contactsRes.ok) {
           const contactsJson = await contactsRes.json();
           if (contactsJson.success) {
@@ -157,7 +158,7 @@ export const AdminDemo: React.FC = () => {
     setEmployeesLoading(true);
     setEmpError('');
     try {
-      const res = await fetch('http://localhost:5000/api/employees');
+      const res = await fetch(`${API_URL}/api/employees`);
       if (res.ok) {
         const json = await res.json();
         if (json.success) {
@@ -202,7 +203,7 @@ export const AdminDemo: React.FC = () => {
     setGalleryLoading(true);
     setGalleryError('');
     try {
-      const res = await fetch('http://localhost:5000/api/gallery');
+      const res = await fetch(`${API_URL}/api/gallery`);
       if (res.ok) {
         const json = await res.json();
         if (json.success) {
@@ -314,7 +315,7 @@ export const AdminDemo: React.FC = () => {
     setAddMessage({ type: '', text: '' });
 
     try {
-      const res = await fetch('http://localhost:5000/api/employees', {
+      const res = await fetch(`${API_URL}/api/employees`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -375,7 +376,7 @@ export const AdminDemo: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/employees/${id}`, {
+      const res = await fetch(`${API_URL}/api/employees/${id}`, {
         method: 'DELETE'
       });
       const json = await res.json();
@@ -402,7 +403,7 @@ export const AdminDemo: React.FC = () => {
     setGalMessage({ type: '', text: '' });
 
     try {
-      const res = await fetch('http://localhost:5000/api/gallery', {
+      const res = await fetch(`${API_URL}/api/gallery`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -447,7 +448,7 @@ export const AdminDemo: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/gallery/${id}`, {
+      const res = await fetch(`${API_URL}/api/gallery/${id}`, {
         method: 'DELETE'
       });
       const json = await res.json();
