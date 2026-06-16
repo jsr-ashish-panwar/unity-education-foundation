@@ -138,6 +138,10 @@ export const AdminDemo: React.FC = () => {
   const [isAddingGal, setIsAddingGal] = useState(false);
   const [galMessage, setGalMessage] = useState({ type: '', text: '' });
 
+  // Filename display states
+  const [empFileName, setEmpFileName] = useState('');
+  const [galFileName, setGalFileName] = useState('');
+
   // Load Inquiries
   const loadInquiries = async () => {
     setInquiriesLoading(true);
@@ -309,6 +313,7 @@ export const AdminDemo: React.FC = () => {
   const handlePhotoFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setEmpFileName(file.name);
       setAddMessage({ type: 'success', text: 'Compressing image...' });
       try {
         const compressed = await compressImage(file, 400, 500, 0.7);
@@ -316,6 +321,7 @@ export const AdminDemo: React.FC = () => {
         setAddMessage({ type: 'success', text: 'Image optimized successfully!' });
       } catch (err) {
         setAddMessage({ type: 'error', text: 'Failed to optimize image.' });
+        setEmpFileName('');
       }
     }
   };
@@ -324,6 +330,7 @@ export const AdminDemo: React.FC = () => {
   const handleGalleryFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setGalFileName(file.name);
       setGalMessage({ type: 'success', text: 'Compressing image...' });
       try {
         const compressed = await compressImage(file, 800, 600, 0.7);
@@ -331,6 +338,7 @@ export const AdminDemo: React.FC = () => {
         setGalMessage({ type: 'success', text: 'Image optimized successfully!' });
       } catch (err) {
         setGalMessage({ type: 'error', text: 'Failed to optimize image.' });
+        setGalFileName('');
       }
     }
   };
@@ -368,6 +376,7 @@ export const AdminDemo: React.FC = () => {
         setEmpRole('');
         setEmpCategory('employee');
         setEmpPhotoUrl('');
+        setEmpFileName('');
         setEmpEmail('');
         setEmpPhone('');
         setEmpBio('');
@@ -451,6 +460,7 @@ export const AdminDemo: React.FC = () => {
         setGalTitle('');
         setGalDescription('');
         setGalImageUrl('');
+        setGalFileName('');
         await loadGalleryItems();
       } else {
         setGalMessage({ type: 'error', text: json.error || 'Failed to save gallery item.' });
@@ -658,7 +668,7 @@ export const AdminDemo: React.FC = () => {
                       <label className="form-label">Photo Upload (Max 2MB)</label>
                       <div className="file-input-wrapper">
                         <Upload size={16} />
-                        <span>Choose Profile Photo</span>
+                        <span>{empFileName || 'Choose Profile Photo'}</span>
                         <input 
                           type="file"
                           accept="image/*"
@@ -755,8 +765,8 @@ export const AdminDemo: React.FC = () => {
                     <Users size={22} className="header-icon-secondary" />
                     <h3>Active Staff Directory ({employees.length})</h3>
                   </div>
-                  <button className="btn btn-outline btn-refresh-list" onClick={loadEmployees} title="Reload list">
-                    <RefreshCw size={14} />
+                  <button className="btn btn-outline btn-refresh-list" onClick={loadEmployees} title="Reload list" disabled={employeesLoading}>
+                    <RefreshCw size={14} className={employeesLoading ? 'spinner' : ''} />
                   </button>
                 </div>
 
@@ -843,7 +853,7 @@ export const AdminDemo: React.FC = () => {
                     <label className="form-label">Image File Upload (Max 2MB)</label>
                     <div className="file-input-wrapper">
                       <Upload size={16} />
-                      <span>Choose Image File</span>
+                      <span>{galFileName || 'Choose Image File'}</span>
                       <input 
                         type="file"
                         accept="image/*"
@@ -915,8 +925,8 @@ export const AdminDemo: React.FC = () => {
                     <ImageIcon size={22} className="header-icon-secondary" />
                     <h3>Live Gallery Archive ({galleryItems.length})</h3>
                   </div>
-                  <button className="btn btn-outline btn-refresh-list" onClick={loadGalleryItems} title="Reload list">
-                    <RefreshCw size={14} />
+                  <button className="btn btn-outline btn-refresh-list" onClick={loadGalleryItems} title="Reload list" disabled={galleryLoading}>
+                    <RefreshCw size={14} className={galleryLoading ? 'spinner' : ''} />
                   </button>
                 </div>
 
@@ -972,8 +982,8 @@ export const AdminDemo: React.FC = () => {
                   <div className="status-header">
                     <Database size={24} className="status-logo-icon" />
                     <h3>Database Engine Status</h3>
-                    <button className="btn btn-outline refresh-btn" onClick={loadInquiries} title="Refresh connection">
-                      <RefreshCw size={14} />
+                    <button className="btn btn-outline refresh-btn" onClick={loadInquiries} title="Refresh connection" disabled={inquiriesLoading}>
+                      <RefreshCw size={14} className={inquiriesLoading ? 'spinner' : ''} />
                     </button>
                   </div>
 
@@ -1033,8 +1043,8 @@ export const AdminDemo: React.FC = () => {
                     <button className="btn btn-outline btn-clear" onClick={clearLocalInquiries}>
                       Clear Client Logs
                     </button>
-                    <button className="btn btn-primary btn-refresh" onClick={loadInquiries}>
-                      <RefreshCw size={16} /> Reload logs
+                    <button className="btn btn-primary btn-refresh" onClick={loadInquiries} disabled={inquiriesLoading}>
+                      <RefreshCw size={16} className={inquiriesLoading ? 'spinner' : ''} /> Reload logs
                     </button>
                   </div>
                 </div>
@@ -1181,6 +1191,16 @@ export const AdminDemo: React.FC = () => {
           font-size: 0.85rem;
           font-weight: 600;
           text-align: left;
+        }
+
+        .spinner {
+          animation: spin 1s linear infinite;
+          display: inline-block;
+        }
+
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
 
         /* Tab Navigation Panel */
