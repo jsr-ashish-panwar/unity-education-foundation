@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import mongoose, { Schema, model, Document } from 'mongoose';
 
 export interface IEmployee extends Document {
   name: string;
@@ -22,4 +22,4 @@ const EmployeeSchema = new Schema<IEmployee>({
   order: { type: Number, default: 0 }
 });
 
-export default model<IEmployee>('Employee', EmployeeSchema);
+export default mongoose.models.Employee || model<IEmployee>('Employee', EmployeeSchema);
