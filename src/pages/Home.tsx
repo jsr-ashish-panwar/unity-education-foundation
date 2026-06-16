@@ -16,12 +16,24 @@ export const Home: React.FC = () => {
     let width = canvas.width = canvas.offsetWidth;
     let height = canvas.height = canvas.offsetHeight;
 
+    const isMobile = () => window.innerWidth <= 768;
+
     const handleResize = () => {
       if (!canvas) return;
-      width = canvas.width = canvas.offsetWidth;
-      height = canvas.height = canvas.offsetHeight;
+      if (isMobile()) {
+        canvas.style.display = 'none';
+      } else {
+        canvas.style.display = 'block';
+        width = canvas.width = canvas.offsetWidth;
+        height = canvas.height = canvas.offsetHeight;
+      }
     };
     window.addEventListener('resize', handleResize);
+
+    // Initial check
+    if (isMobile()) {
+      canvas.style.display = 'none';
+    }
 
     const numParticles = 75;
     const particles: { x: number; y: number; z: number; color: string }[] = [];
@@ -46,6 +58,7 @@ export const Home: React.FC = () => {
     let targetAngleY = 0.002;
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (isMobile()) return;
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left - width / 2;
       const y = e.clientY - rect.top - height / 2;
@@ -59,6 +72,12 @@ export const Home: React.FC = () => {
     }
 
     const animate = () => {
+      if (isMobile()) {
+        ctx.clearRect(0, 0, width, height);
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
 
       angleX += (targetAngleX - angleX) * 0.05;
@@ -613,6 +632,9 @@ export const Home: React.FC = () => {
         }
 
         @media (max-width: 768px) {
+          canvas {
+            display: none !important;
+          }
           .hero-title {
             font-size: 2.25rem;
           }
