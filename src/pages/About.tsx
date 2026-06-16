@@ -41,9 +41,13 @@ export const About: React.FC = () => {
   ];
 
   return (
-    <div className="about-page">
+    <div className="about-page" style={{ position: 'relative', overflow: 'hidden' }}>
+      <div className="bg-glow-blob blob-primary" style={{ top: '8%', left: '-15%' }}></div>
+      <div className="bg-glow-blob blob-secondary" style={{ top: '40%', right: '-12%' }}></div>
+      <div className="bg-glow-blob blob-primary" style={{ bottom: '10%', left: '-10%' }}></div>
+
       {/* Subpage Header Banner */}
-      <section className="about-hero">
+      <section className="about-hero hero-wallpaper-bg">
         <div className="container text-center">
           <span className="sub-tag">WHO WE ARE</span>
           <h1 className="sub-title">About Unity Education Foundation</h1>
@@ -133,7 +137,11 @@ export const About: React.FC = () => {
 
           <div className="why-grid">
             {whyChooseUs.map((item, idx) => (
-              <div key={idx} className="why-card glass-card">
+              <div
+                key={idx}
+                className="why-card glass-card animate-slide-up"
+                style={{ animationDelay: `${idx * 100}ms` }}
+              >
                 <div className="why-icon-box">
                   {item.icon}
                 </div>
@@ -375,6 +383,76 @@ export const About: React.FC = () => {
             padding: 30px 20px;
           }
         }
+
+        @media (max-width: 480px) {
+          .about-hero {
+            padding: 60px 0;
+          }
+          .sub-title {
+            font-size: 1.8rem;
+          }
+          .sub-desc {
+            font-size: 0.98rem;
+          }
+          .story-heading {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+          }
+          .story-p {
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+          }
+          .story-highlights {
+            padding: 24px 16px;
+            gap: 20px;
+          }
+          .highlights-heading {
+            font-size: 1.3rem;
+          }
+          .pillar-item {
+            gap: 12px;
+          }
+          .pillar-num {
+            width: 44px;
+            height: 44px;
+            font-size: 1.35rem;
+          }
+          .pillar-text h4 {
+            font-size: 1.05rem;
+          }
+          .pillar-text p {
+            font-size: 0.85rem;
+          }
+          .detail-card h3 {
+            font-size: 1.3rem;
+          }
+          .detail-card p {
+            font-size: 0.92rem;
+            line-height: 1.6;
+          }
+          .why-card {
+            padding: 16px;
+            gap: 12px;
+          }
+          .why-icon-box {
+            padding: 10px;
+          }
+          .why-text h4 {
+            font-size: 1.05rem;
+          }
+          .why-text p {
+            font-size: 0.88rem;
+          }
+          .commitment-container {
+            padding: 24px 16px;
+          }
+          .commitment-p {
+            font-size: 0.95rem;
+            line-height: 1.65;
+            margin-bottom: 16px;
+          }
+        }
+
       `}</style>
     </div>
   );

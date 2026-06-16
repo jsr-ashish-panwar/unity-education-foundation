@@ -296,6 +296,53 @@ export const Footer: React.FC = () => {
             text-align: center;
           }
         }
+
+        @media (max-width: 480px) {
+          .footer {
+            padding: 48px 0 0 0;
+          }
+          .footer-grid {
+            gap: 28px;
+            margin-bottom: 40px;
+          }
+          .footer-logo {
+            justify-content: center;
+          }
+          .footer-logo-img {
+            height: 50px;
+          }
+          .logo-title-footer {
+            font-size: 1.35rem;
+          }
+          .logo-subtitle-footer {
+            font-size: 0.55rem;
+          }
+          .footer-desc {
+            text-align: center;
+            font-size: 0.88rem;
+          }
+          .est-badge {
+            align-self: center;
+          }
+          .footer-col {
+            align-items: center;
+            text-align: center;
+            gap: 16px;
+          }
+          .footer-title::after {
+            left: 50%;
+            transform: translateX(-50%);
+          }
+          .footer-contacts li {
+            justify-content: center;
+            text-align: center;
+            font-size: 0.88rem;
+          }
+          .footer-links a:hover {
+            transform: none; /* Disable horizontal slide hover effect on tap */
+          }
+        }
+
       `}</style>
     </footer>
   );

@@ -89,9 +89,13 @@ export const Services: React.FC = () => {
   ];
 
   return (
-    <div className="services-page">
+    <div className="services-page" style={{ position: 'relative', overflow: 'hidden' }}>
+      <div className="bg-glow-blob blob-primary" style={{ top: '8%', left: '-15%' }}></div>
+      <div className="bg-glow-blob blob-secondary" style={{ top: '35%', right: '-12%' }}></div>
+      <div className="bg-glow-blob blob-primary" style={{ bottom: '15%', left: '-10%' }}></div>
+
       {/* Services Sub-Hero Banner */}
-      <section className="services-hero">
+      <section className="services-hero hero-wallpaper-bg">
         <div className="container text-center">
           <span className="sub-tag">WHAT WE OFFER</span>
           <h1 className="sub-title">Our Services</h1>
@@ -118,6 +122,7 @@ export const Services: React.FC = () => {
                 description={service.description}
                 icon={service.icon}
                 points={service.points}
+                delay={index * 100}
               />
             ))}
           </div>
@@ -169,7 +174,41 @@ export const Services: React.FC = () => {
           color: var(--text-secondary);
           font-size: 1.1rem;
         }
+
+        @media (max-width: 768px) {
+          .services-hero {
+            padding: 60px 0;
+          }
+          .sub-title {
+            font-size: 2rem;
+          }
+          .quote-card {
+            padding: 30px 20px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .services-hero {
+            padding: 50px 0;
+          }
+          .sub-title {
+            font-size: 1.8rem;
+          }
+          .sub-desc {
+            font-size: 0.95rem;
+          }
+          .quote-card {
+            padding: 24px 16px;
+          }
+          .quote-card h3 {
+            font-size: 1.25rem;
+          }
+          .quote-card p {
+            font-size: 0.95rem;
+          }
+        }
       `}</style>
+
     </div>
   );
 };

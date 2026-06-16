@@ -29,62 +29,9 @@ const LOCAL_FALLBACK_EMPLOYEES: Employee[] = [
     email: "sunita.siwach@unityeducation.org",
     phone: "+91 9557558628",
     bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance."
-  },
-  {
-    name: "Rajesh Kumar",
-    role: "Senior Operations Manager",
-    category: "employee",
-    photoUrl: "/assets/employee1.webp",
-    email: "rajesh.k@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Manages day-to-day workflow tracking and administrative systems with extreme precision."
-  },
-  {
-    name: "Priyanka Chaudhary",
-    role: "Data Analytics Head",
-    category: "employee",
-    photoUrl: "/assets/employee2.webp",
-    email: "priyanka.c@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Specialist in large-scale database operations, verification procedures, and documentation structures."
-  },
-  {
-    name: "Amit Kasana",
-    role: "Lead Field Monitoring Officer",
-    category: "employee",
-    photoUrl: "/assets/employee3.webp",
-    email: "amit.k@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Coordinates field-level evaluation frameworks and regular compliance auditing audits."
-  },
-  {
-    name: "Komal Tyagi",
-    role: "Reporting & Documentation Specialist",
-    category: "employee",
-    photoUrl: "/assets/employee4.webp",
-    email: "komal.t@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Transforms complex operational data points into structured, highly-detailed reports."
-  },
-  {
-    name: "Rahul Verma",
-    role: "Stakeholder Communications Coordinator",
-    category: "employee",
-    photoUrl: "/assets/employee5.webp",
-    email: "rahul.v@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Ensures seamless queries resolution and prompt responses across all digital contact nodes."
-  },
-  {
-    name: "Neha Siddiqui",
-    role: "Systems Administrator",
-    category: "employee",
-    photoUrl: "/assets/employee6.webp",
-    email: "neha.s@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Leverages modern tracking networks and system monitoring configurations."
   }
 ];
+
 
 export const Team: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>(LOCAL_FALLBACK_EMPLOYEES);
@@ -117,9 +64,13 @@ export const Team: React.FC = () => {
   const staff = employees.filter(e => e.category === 'employee');
 
   return (
-    <div className="team-page">
+    <div className="team-page" style={{ position: 'relative', overflow: 'hidden' }}>
+      <div className="bg-glow-blob blob-primary" style={{ top: '6%', left: '-15%' }}></div>
+      <div className="bg-glow-blob blob-secondary" style={{ top: '35%', right: '-12%' }}></div>
+      <div className="bg-glow-blob blob-primary" style={{ bottom: '15%', left: '-10%' }}></div>
+
       {/* Subpage Header Banner */}
-      <section className="team-hero">
+      <section className="team-hero hero-wallpaper-bg">
         <div className="container text-center">
           <span className="sub-tag">OUR TEAM</span>
           <h1 className="sub-title">Meet Our Professionals</h1>
@@ -147,7 +98,11 @@ export const Team: React.FC = () => {
             <div className="leadership-cards-container">
               {/* Director Card */}
               {directors.map((dir, idx) => (
-                <div key={idx} className="leader-card glass-card spotlight-card">
+                <div
+                  key={idx}
+                  className="leader-card glass-card spotlight-card animate-slide-up"
+                  style={{ animationDelay: `${idx * 150}ms` }}
+                >
                   <div className="leader-photo-container">
                     {dir.photoUrl ? (
                       <img src={dir.photoUrl} alt={dir.name} className="leader-photo" />
@@ -178,7 +133,11 @@ export const Team: React.FC = () => {
 
               {/* Secretary Card */}
               {secretaries.map((sec, idx) => (
-                <div key={idx} className="leader-card glass-card spotlight-card">
+                <div
+                  key={idx}
+                  className="leader-card glass-card spotlight-card animate-slide-up"
+                  style={{ animationDelay: `${(idx + directors.length) * 150}ms` }}
+                >
                   <div className="leader-photo-container">
                     {sec.photoUrl ? (
                       <img src={sec.photoUrl} alt={sec.name} className="leader-photo" />
@@ -225,7 +184,11 @@ export const Team: React.FC = () => {
           {!loading && (
             <div className="grid-3 staff-grid">
               {staff.map((employee, idx) => (
-                <div key={idx} className="staff-card glass-card">
+                <div
+                  key={idx}
+                  className="staff-card glass-card animate-slide-up"
+                  style={{ animationDelay: `${idx * 100}ms` }}
+                >
                   <div className="staff-photo-container">
                     {employee.photoUrl ? (
                       <img src={employee.photoUrl} alt={employee.name} className="staff-photo" />
@@ -396,10 +359,12 @@ export const Team: React.FC = () => {
           gap: 8px;
           font-size: 0.9rem;
           color: var(--text-secondary);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .contact-link:hover {
-          color: var(--primary);
+          color: var(--secondary);
+          transform: translateX(4px);
         }
 
         /* Staff Card Styles */
@@ -490,13 +455,54 @@ export const Team: React.FC = () => {
             text-align: center;
           }
           .leader-photo-container {
-            width: 100%;
-            height: 240px;
+            width: 180px;
+            height: 225px;
+            margin: 0 auto;
           }
           .leader-contact-info {
             align-items: center;
           }
         }
+
+        @media (max-width: 480px) {
+          .team-hero {
+            padding: 60px 0;
+          }
+          .leader-card {
+            padding: 20px 16px;
+            gap: 16px;
+          }
+          .leader-name {
+            font-size: 1.3rem;
+          }
+          .leader-role-text {
+            font-size: 0.88rem;
+            margin-bottom: 8px;
+          }
+          .leader-bio {
+            font-size: 0.88rem;
+            margin-bottom: 12px;
+          }
+          .contact-link {
+            font-size: 0.85rem;
+          }
+          .staff-photo-container {
+            height: 200px;
+            margin-bottom: 16px;
+          }
+          .staff-name {
+            font-size: 1.15rem;
+          }
+          .staff-bio {
+            font-size: 0.85rem;
+            min-height: auto;
+            margin-bottom: 12px;
+          }
+          .staff-contact {
+            padding-top: 10px;
+          }
+        }
+
       `}</style>
     </div>
   );

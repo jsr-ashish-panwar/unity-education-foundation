@@ -6,11 +6,15 @@ interface ServiceCardProps {
   description: string;
   icon: React.ReactNode;
   points: string[];
+  delay?: number;
 }
 
-export const ServiceCard: React.FC<ServiceCardProps> = ({ title, description, icon, points }) => {
+export const ServiceCard: React.FC<ServiceCardProps> = ({ title, description, icon, points, delay }) => {
   return (
-    <div className="service-card glass-card animate-fade-in">
+    <div 
+      className="service-card glass-card animate-slide-up"
+      style={{ animationDelay: delay ? `${delay}ms` : undefined }}
+    >
       <div className="service-card-header">
         <div className="service-icon-wrapper">
           {icon}

@@ -38,68 +38,11 @@ const defaultEmployees = [
     phone: "+91 9557558628",
     bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance.",
     order: 2
-  },
-  {
-    name: "Rajesh Kumar",
-    role: "Senior Operations Manager",
-    category: "employee",
-    photoUrl: "/assets/employee1.webp",
-    email: "rajesh.k@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Manages day-to-day workflow tracking and administrative systems with extreme precision.",
-    order: 3
-  },
-  {
-    name: "Priyanka Chaudhary",
-    role: "Data Analytics Head",
-    category: "employee",
-    photoUrl: "/assets/employee2.webp",
-    email: "priyanka.c@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Specialist in large-scale database operations, verification procedures, and documentation structures.",
-    order: 4
-  },
-  {
-    name: "Amit Kasana",
-    role: "Lead Field Monitoring Officer",
-    category: "employee",
-    photoUrl: "/assets/employee3.webp",
-    email: "amit.k@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Coordinates field-level evaluation frameworks and regular compliance auditing audits.",
-    order: 5
-  },
-  {
-    name: "Komal Tyagi",
-    role: "Reporting & Documentation Specialist",
-    category: "employee",
-    photoUrl: "/assets/employee4.webp",
-    email: "komal.t@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Transforms complex operational data points into structured, highly-detailed reports.",
-    order: 6
-  },
-  {
-    name: "Rahul Verma",
-    role: "Stakeholder Communications Coordinator",
-    category: "employee",
-    photoUrl: "/assets/employee5.webp",
-    email: "rahul.v@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Ensures seamless queries resolution and prompt responses across all digital contact nodes.",
-    order: 7
-  },
-  {
-    name: "Neha Siddiqui",
-    role: "Systems Administrator",
-    category: "employee",
-    photoUrl: "/assets/employee6.webp",
-    email: "neha.s@unityeducation.org",
-    phone: "+91 9557558628",
-    bio: "Leverages modern tracking networks and system monitoring configurations.",
-    order: 8
   }
 ];
+
+// In-memory array for tracking changes in Mock Mode
+let mockEmployees: any[] = [...defaultEmployees];
 
 // Initialize DB and populate defaults if DB is active
 const initDB = async () => {
@@ -111,6 +54,9 @@ const initDB = async () => {
       if (count === 0) {
         await Employee.insertMany(defaultEmployees);
         console.log('Seed: Default employees populated in MongoDB Atlas.');
+      } else if (count === 8) {
+        console.log('Migration: Found 8 employees in Atlas (old seed). Deleting 6 staff members to match new requirements.');
+        await Employee.deleteMany({ category: 'employee' });
       }
     } catch (err) {
       console.error('Error seeding default employees:', err);
@@ -187,10 +133,81 @@ app.get('/api/employees', async (req: Request, res: Response) => {
       const employees = await Employee.find().sort({ order: 1 });
       return res.json({ success: true, data: employees });
     } else {
-      return res.json({ success: true, data: defaultEmployees });
+      return res.json({ success: true, data: mockEmployees });
     }
   } catch (error) {
     return res.status(500).json({ error: 'Failed to retrieve employees list', details: (error as Error).message });
+  }
+});
+
+// 5. Add Employee
+app.post('/api/employees', async (req: Request, res: Response) => {
+  const { name, role, category, photoUrl, email, phone, bio } = req.body;
+
+  if (!name || !role || !category) {
+    return res.status(400).json({ error: 'Please provide all required fields: name, role, category' });
+  }
+
+  try {
+    if (isDbConnected) {
+      const count = await Employee.countDocuments();
+      const newEmployee = new Employee({
+        name,
+        role,
+        category,
+        photoUrl,
+        email,
+        phone,
+        bio,
+        order: count + 1
+      });
+      const saved = await newEmployee.save();
+      return res.status(201).json({ success: true, data: saved, message: 'Employee saved to MongoDB Atlas' });
+    } else {
+      const newEmployeeMock = {
+        _id: 'mock_emp_' + Math.random().toString(36).substr(2, 9),
+        name,
+        role,
+        category,
+        photoUrl,
+        email,
+        phone,
+        bio,
+        order: mockEmployees.length + 1
+      };
+      mockEmployees.push(newEmployeeMock);
+      return res.status(201).json({ 
+        success: true, 
+        data: newEmployeeMock, 
+        message: 'Employee saved successfully in Server Memory (MOCK Mode)' 
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to add employee', details: (error as Error).message });
+  }
+});
+
+// 6. Delete Employee
+app.delete('/api/employees/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    if (isDbConnected) {
+      const deleted = await Employee.findByIdAndDelete(id);
+      if (!deleted) {
+        return res.status(404).json({ error: 'Employee not found' });
+      }
+      return res.json({ success: true, data: deleted, message: 'Employee deleted from MongoDB Atlas' });
+    } else {
+      const index = mockEmployees.findIndex(emp => emp._id === id);
+      if (index === -1) {
+        return res.status(404).json({ error: 'Employee not found in Mock data' });
+      }
+      const deleted = mockEmployees.splice(index, 1)[0];
+      return res.json({ success: true, data: deleted, message: 'Employee deleted from Server Memory (MOCK Mode)' });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to delete employee', details: (error as Error).message });
   }
 });
 

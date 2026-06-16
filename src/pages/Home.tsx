@@ -1,9 +1,143 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Star, Award, Cpu, Users, ArrowRight, Heart } from 'lucide-react';
 import logo from '../assets/logo.png';
 
 export const Home: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationId: number;
+    let width = canvas.width = canvas.offsetWidth;
+    let height = canvas.height = canvas.offsetHeight;
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    };
+    window.addEventListener('resize', handleResize);
+
+    const numParticles = 75;
+    const particles: { x: number; y: number; z: number; color: string }[] = [];
+    const radius = Math.min(width, height) * 0.38;
+
+    for (let i = 0; i < numParticles; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      particles.push({
+        x: radius * Math.sin(phi) * Math.cos(theta),
+        y: radius * Math.sin(phi) * Math.sin(theta),
+        z: radius * Math.cos(phi),
+        color: i % 2 === 0 ? '#d99b26' : '#0c2340'
+      });
+    }
+
+    let angleX = 0.0015;
+    let angleY = 0.002;
+    const fov = 320;
+
+    let targetAngleX = 0.0015;
+    let targetAngleY = 0.002;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left - width / 2;
+      const y = e.clientY - rect.top - height / 2;
+      targetAngleY = (x / width) * 0.008;
+      targetAngleX = (y / height) * 0.008;
+    };
+
+    const parentSection = canvas.parentElement;
+    if (parentSection) {
+      parentSection.addEventListener('mousemove', handleMouseMove);
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      angleX += (targetAngleX - angleX) * 0.05;
+      angleY += (targetAngleY - angleY) * 0.05;
+
+      const cosX = Math.cos(angleX);
+      const sinX = Math.sin(angleX);
+      const cosY = Math.cos(angleY);
+      const sinY = Math.sin(angleY);
+
+      const projected: { x: number; y: number; size: number; z: number; color: string }[] = [];
+
+      for (let i = 0; i < numParticles; i++) {
+        const p = particles[i];
+
+        let x1 = p.x * cosY - p.z * sinY;
+        let z1 = p.z * cosY + p.x * sinY;
+
+        let y2 = p.y * cosX - z1 * sinX;
+        let z2 = z1 * cosX + p.y * sinX;
+
+        p.x = x1;
+        p.y = y2;
+        p.z = z2;
+
+        const scale = fov / (fov + z2 + radius);
+        const projX = x1 * scale + width / 2;
+        const projY = y2 * scale + height / 2;
+        const size = Math.max(1, scale * 3);
+
+        projected.push({
+          x: projX,
+          y: projY,
+          size: size,
+          z: z2,
+          color: p.color
+        });
+      }
+
+      ctx.lineWidth = 0.45;
+      for (let i = 0; i < numParticles; i++) {
+        const p1 = projected[i];
+        for (let j = i + 1; j < numParticles; j++) {
+          const p2 = projected[j];
+          const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+          if (dist < 80) {
+            const opacity = (1 - dist / 80) * 0.22 * (fov / (fov + (p1.z + p2.z) / 2 + radius));
+            ctx.strokeStyle = `rgba(217, 155, 38, ${opacity})`;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      for (let i = 0; i < numParticles; i++) {
+        const p = projected[i];
+        const opacity = 0.12 + 0.68 * (fov / (fov + p.z + radius));
+        ctx.fillStyle = p.color === '#d99b26' ? `rgba(217, 155, 38, ${opacity})` : `rgba(12, 35, 64, ${opacity})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (parentSection) {
+        parentSection.removeEventListener('mousemove', handleMouseMove);
+      }
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
   const coreValues = [
     {
       title: "Integrity",
@@ -38,10 +172,24 @@ export const Home: React.FC = () => {
   ];
 
   return (
-    <div className="home-page">
+    <div className="home-page" style={{ position: 'relative', overflow: 'hidden' }}>
+      <div className="bg-glow-blob blob-primary" style={{ top: '5%', left: '-10%' }}></div>
+      <div className="bg-glow-blob blob-secondary" style={{ top: '35%', right: '-15%' }}></div>
+      <div className="bg-glow-blob blob-primary" style={{ bottom: '15%', left: '-20%' }}></div>
+
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="container hero-grid">
+      <section className="hero-section hero-wallpaper-bg hero-wallpaper-light" style={{ position: 'relative', overflow: 'hidden' }}>
+        <canvas ref={canvasRef} style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          zIndex: 1,
+          opacity: 0.75
+        }}></canvas>
+        <div className="container hero-grid" style={{ position: 'relative', zIndex: 2 }}>
           <div className="hero-content animate-fade-in">
             <span className="hero-tag">ESTABLISHED 2017</span>
             <h1 className="hero-title">
@@ -148,7 +296,11 @@ export const Home: React.FC = () => {
           
           <div className="grid-3 values-grid">
             {coreValues.map((val, idx) => (
-              <div key={idx} className="value-card glass-card">
+              <div
+                key={idx}
+                className="value-card glass-card animate-slide-up"
+                style={{ animationDelay: `${idx * 120}ms` }}
+              >
                 <div className="value-icon-box">
                   {val.icon}
                 </div>
@@ -467,8 +619,90 @@ export const Home: React.FC = () => {
           .cta-title {
             font-size: 2rem;
           }
+          .hero-image-container {
+            display: none;
+          }
         }
-      `}</style>
+
+        @media (max-width: 480px) {
+          .hero-section {
+            padding: 60px 0 40px 0;
+          }
+          .hero-title {
+            font-size: 1.85rem;
+            line-height: 1.25;
+            margin-bottom: 16px;
+          }
+          .hero-subtitle {
+            font-size: 1rem;
+            margin-bottom: 24px;
+          }
+          .hero-logo-large {
+            max-height: 200px;
+          }
+          .welcome-title {
+            font-size: 1.6rem;
+            margin-bottom: 16px;
+          }
+          .welcome-text {
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+          }
+          .welcome-stats {
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+          }
+          .stat-card {
+            padding: 12px 16px;
+            text-align: center;
+          }
+          .stat-num {
+            font-size: 1.75rem;
+          }
+          .card-sub-title {
+            font-size: 1.3rem;
+          }
+          .welcome-bullets {
+            gap: 12px;
+            margin-bottom: 24px;
+          }
+          .welcome-bullets li {
+            font-size: 0.88rem;
+          }
+          .mission-title, .vision-title {
+            font-size: 1.4rem;
+          }
+          .mission-text, .vision-text {
+            font-size: 0.92rem;
+          }
+          .value-card {
+            padding: 24px 16px;
+          }
+          .value-icon-box {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 16px;
+          }
+          .value-card-title {
+            font-size: 1.15rem;
+          }
+          .value-card-desc {
+            font-size: 0.88rem;
+          }
+          .cta-container {
+            padding: 36px 16px;
+          }
+          .cta-title {
+            font-size: 1.65rem;
+          }
+          .cta-subtitle {
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+          }
+        }
+       `}</style>
+
     </div>
   );
 };

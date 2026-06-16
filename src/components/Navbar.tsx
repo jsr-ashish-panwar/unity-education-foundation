@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import logo from '../assets/logo.png';
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,8 +25,13 @@ export const Navbar: React.FC = () => {
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
 
+  const navbarClasses = [
+    'navbar',
+    (isScrolled || !isHomePage) ? 'scrolled' : ''
+  ].filter(Boolean).join(' ');
+
   return (
-    <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+    <nav className={navbarClasses}>
       <div className="container nav-container">
         <Link to="/" className="nav-logo" onClick={closeMenu}>
           <img src={logo} alt="Unity Education Foundation" className="logo-img" />
@@ -58,26 +65,25 @@ export const Navbar: React.FC = () => {
         <button className="nav-toggle" onClick={toggleMenu} aria-label="Toggle Menu">
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
+      </div>
 
-        {/* Mobile Navigation Drawer */}
-        <div className={`nav-links-mobile ${isOpen ? 'open' : ''}`}>
-          <NavLink to="/" className={({ isActive }) => `nav-item-mobile ${isActive ? 'active' : ''}`} onClick={closeMenu}>
-            Home
-          </NavLink>
-          <NavLink to="/about" className={({ isActive }) => `nav-item-mobile ${isActive ? 'active' : ''}`} onClick={closeMenu}>
-            About Us
-          </NavLink>
-          <NavLink to="/services" className={({ isActive }) => `nav-item-mobile ${isActive ? 'active' : ''}`} onClick={closeMenu}>
-            Services
-          </NavLink>
-          <NavLink to="/team" className={({ isActive }) => `nav-item-mobile ${isActive ? 'active' : ''}`} onClick={closeMenu}>
-            Our Team
-          </NavLink>
-          <NavLink to="/contact" className={({ isActive }) => `nav-item-mobile ${isActive ? 'active' : ''}`} onClick={closeMenu}>
-            Contact Us
-          </NavLink>
-
-        </div>
+      {/* Mobile Navigation Drawer */}
+      <div className={`nav-links-mobile ${isOpen ? 'open' : ''}`}>
+        <NavLink to="/" className={({ isActive }) => `nav-item-mobile ${isActive ? 'active' : ''}`} onClick={closeMenu}>
+          Home
+        </NavLink>
+        <NavLink to="/about" className={({ isActive }) => `nav-item-mobile ${isActive ? 'active' : ''}`} onClick={closeMenu}>
+          About Us
+        </NavLink>
+        <NavLink to="/services" className={({ isActive }) => `nav-item-mobile ${isActive ? 'active' : ''}`} onClick={closeMenu}>
+          Services
+        </NavLink>
+        <NavLink to="/team" className={({ isActive }) => `nav-item-mobile ${isActive ? 'active' : ''}`} onClick={closeMenu}>
+          Our Team
+        </NavLink>
+        <NavLink to="/contact" className={({ isActive }) => `nav-item-mobile ${isActive ? 'active' : ''}`} onClick={closeMenu}>
+          Contact Us
+        </NavLink>
       </div>
 
       {/* Styles for Navbar since we are doing vanilla CSS */}
@@ -105,11 +111,13 @@ export const Navbar: React.FC = () => {
           border-bottom: 1px solid var(--border-color);
         }
 
+
         .nav-container {
           display: flex;
           justify-content: space-between;
           align-items: center;
           width: 100%;
+          flex-grow: 1;
         }
 
         .nav-logo {
@@ -159,7 +167,7 @@ export const Navbar: React.FC = () => {
 
         .nav-item {
           font-family: var(--font-heading);
-          font-weight: 600;
+          font-weight: 700;
           font-size: 0.95rem;
           color: var(--text-secondary);
           position: relative;
@@ -193,6 +201,11 @@ export const Navbar: React.FC = () => {
           color: var(--primary);
           border: none;
           cursor: pointer;
+          padding: 8px;
+          border-radius: 50%;
+          transition: var(--transition-fast);
+          width: 44px;
+          height: 44px;
         }
 
         .nav-links-mobile {
@@ -205,7 +218,13 @@ export const Navbar: React.FC = () => {
           }
 
           .nav-toggle {
-            display: block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .nav-toggle:hover, .nav-toggle:active {
+            background-color: rgba(12, 35, 64, 0.08);
           }
 
           .nav-links-mobile {
@@ -219,13 +238,14 @@ export const Navbar: React.FC = () => {
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border-color);
-            padding: 24px;
-            gap: 20px;
+            padding: 16px;
+            gap: 8px;
             transform: translateY(-120%);
             opacity: 0;
             pointer-events: none;
             transition: var(--transition-normal);
             box-shadow: var(--shadow-md);
+            z-index: 999;
           }
 
           .navbar.scrolled .nav-links-mobile {
@@ -240,20 +260,55 @@ export const Navbar: React.FC = () => {
 
           .nav-item-mobile {
             font-family: var(--font-heading);
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1.05rem;
+            font-weight: 700;
             color: var(--text-secondary);
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
           }
 
           .nav-item-mobile.active, .nav-item-mobile:hover {
             color: var(--primary);
-            padding-left: 8px;
+            background-color: rgba(12, 35, 64, 0.05);
+            padding-left: 20px;
           }
-
-
         }
+
+        @media (max-width: 480px) {
+          .navbar {
+            height: 65px;
+          }
+          .navbar.scrolled {
+            height: 60px;
+          }
+          .logo-img {
+            height: 38px;
+          }
+          .navbar.scrolled .logo-img {
+            height: 34px;
+          }
+          .logo-title {
+            font-size: 1.2rem;
+          }
+          .logo-subtitle {
+            font-size: 0.52rem;
+            letter-spacing: 1px;
+          }
+          .nav-links-mobile {
+            top: 65px;
+            padding: 16px;
+            gap: 12px;
+          }
+          .navbar.scrolled .nav-links-mobile {
+            top: 60px;
+          }
+          .nav-item-mobile {
+            font-size: 0.95rem;
+            padding: 6px 0;
+          }
+        }
+
       `}</style>
     </nav>
   );
