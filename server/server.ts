@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 import Contact from './models/Contact';
 import Employee from './models/Employee';
+import GalleryItem from './models/GalleryItem';
 
 dotenv.config();
 
@@ -41,8 +42,23 @@ const defaultEmployees = [
   }
 ];
 
+// Default gallery item list
+const defaultGalleryItems = [
+  {
+    title: "Educational Support Distribution",
+    description: "Providing learning materials and kits to children at community centers.",
+    imageUrl: "/wall1.jpg"
+  },
+  {
+    title: "Community Outreach",
+    description: "Helping build robust community operations and supportive networks.",
+    imageUrl: "/mrs.chandni chauhan.jpeg"
+  }
+];
+
 // In-memory array for tracking changes in Mock Mode
 let mockEmployees: any[] = [...defaultEmployees];
+let mockGalleryItems: any[] = [...defaultGalleryItems];
 
 // Initialize DB and populate defaults if DB is active
 const initDB = async () => {
@@ -69,8 +85,15 @@ const initDB = async () => {
         sunita.phone = "+91 8979288628";
         await sunita.save();
       }
+
+      // Seeding Gallery Items
+      const galleryCount = await GalleryItem.countDocuments();
+      if (galleryCount === 0) {
+        await GalleryItem.insertMany(defaultGalleryItems);
+        console.log('Seed: Default gallery items populated in MongoDB Atlas.');
+      }
     } catch (err) {
-      console.error('Error seeding default employees:', err);
+      console.error('Error seeding default employees/gallery:', err);
     }
   }
 };
@@ -222,7 +245,76 @@ app.delete('/api/employees/:id', async (req: Request, res: Response) => {
   }
 });
 
-// Start Express
+// 7. Get Gallery Items
+app.get('/api/gallery', async (req: Request, res: Response) => {
+  try {
+    if (isDbConnected) {
+      const items = await GalleryItem.find().sort({ createdAt: -1 });
+      return res.json({ success: true, data: items });
+    } else {
+      return res.json({ success: true, data: mockGalleryItems });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to retrieve gallery items', details: (error as Error).message });
+  }
+});
+
+// 8. Add Gallery Item
+app.post('/api/gallery', async (req: Request, res: Response) => {
+  const { title, description, imageUrl } = req.body;
+
+  if (!imageUrl) {
+    return res.status(400).json({ error: 'Please provide required field: imageUrl' });
+  }
+
+  try {
+    if (isDbConnected) {
+      const newItem = new GalleryItem({ title, description, imageUrl });
+      const saved = await newItem.save();
+      return res.status(201).json({ success: true, data: saved, message: 'Gallery item saved to MongoDB Atlas' });
+    } else {
+      const newItemMock = {
+        _id: 'mock_gal_' + Math.random().toString(36).substr(2, 9),
+        title: title || '',
+        description: description || '',
+        imageUrl,
+        createdAt: new Date()
+      };
+      mockGalleryItems.unshift(newItemMock);
+      return res.status(201).json({ 
+        success: true, 
+        data: newItemMock, 
+        message: 'Gallery item saved successfully in Server Memory (MOCK Mode)' 
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to add gallery item', details: (error as Error).message });
+  }
+});
+
+// 9. Delete Gallery Item
+app.delete('/api/gallery/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    if (isDbConnected) {
+      const deleted = await GalleryItem.findByIdAndDelete(id);
+      if (!deleted) {
+        return res.status(404).json({ error: 'Gallery item not found' });
+      }
+      return res.json({ success: true, data: deleted, message: 'Gallery item deleted from MongoDB Atlas' });
+    } else {
+      const index = mockGalleryItems.findIndex(item => item._id === id);
+      if (index === -1) {
+        return res.status(404).json({ error: 'Gallery item not found in Mock data' });
+      }
+      const deleted = mockGalleryItems.splice(index, 1)[0];
+      return res.json({ success: true, data: deleted, message: 'Gallery item deleted from Server Memory (MOCK Mode)' });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to delete gallery item', details: (error as Error).message });
+  }
+});
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   await initDB();

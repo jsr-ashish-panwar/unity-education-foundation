@@ -38,6 +38,9 @@ export const Footer: React.FC = () => {
               <Link to="/about"><ArrowRight size={14} /> About Us</Link>
             </li>
             <li>
+              <Link to="/team"><ArrowRight size={14} /> Our Team</Link>
+            </li>
+            <li>
               <Link to="/services"><ArrowRight size={14} /> Services</Link>
             </li>
             <li>

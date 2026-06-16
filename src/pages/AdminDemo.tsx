@@ -13,7 +13,9 @@ import {
   Users, 
   Upload, 
   User, 
-  CheckCircle
+  CheckCircle,
+  Image as ImageIcon,
+  Plus
 } from 'lucide-react';
 
 interface ContactInquiry {
@@ -37,6 +39,14 @@ interface Employee {
   bio?: string;
 }
 
+interface GalleryItem {
+  _id?: string;
+  title?: string;
+  description?: string;
+  imageUrl: string;
+  createdAt?: string | Date;
+}
+
 export const AdminDemo: React.FC = () => {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -46,7 +56,7 @@ export const AdminDemo: React.FC = () => {
   const [loginError, setLoginError] = useState('');
 
   // Main navigation tab
-  const [activeTab, setActiveTab] = useState<'employees' | 'inquiries'>('employees');
+  const [activeTab, setActiveTab] = useState<'employees' | 'gallery' | 'inquiries'>('employees');
 
   // Inquiries State
   const [inquiries, setInquiries] = useState<ContactInquiry[]>([]);
@@ -72,6 +82,18 @@ export const AdminDemo: React.FC = () => {
   const [empBio, setEmpBio] = useState('');
   const [isAddingEmp, setIsAddingEmp] = useState(false);
   const [addMessage, setAddMessage] = useState({ type: '', text: '' });
+
+  // Gallery Management State
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(true);
+  const [galleryError, setGalleryError] = useState('');
+  
+  // Add Gallery Form State
+  const [galTitle, setGalTitle] = useState('');
+  const [galDescription, setGalDescription] = useState('');
+  const [galImageUrl, setGalImageUrl] = useState('');
+  const [isAddingGal, setIsAddingGal] = useState(false);
+  const [galMessage, setGalMessage] = useState({ type: '', text: '' });
 
   // Load Inquiries
   const loadInquiries = async () => {
@@ -148,7 +170,6 @@ export const AdminDemo: React.FC = () => {
       }
     } catch (err) {
       setEmpError('Express server is offline. Add/delete modifications will run in frontend fallback memory.');
-      // Load fallback list locally
       setEmployees([
         {
           _id: 'mock_dir',
@@ -162,12 +183,12 @@ export const AdminDemo: React.FC = () => {
         },
         {
           _id: 'mock_sec',
-          name: "Mrs. Sunita Siwach",
-          role: "Executive Secretary",
+          name: "Mrs. Chandni Chauhan",
+          role: "Secretary",
           category: "secretary",
-          photoUrl: "/assets/secretary.webp",
-          email: "sunita.siwach@unityeducation.org",
-          phone: "+91 9557558628",
+          photoUrl: "/mrs.chandni chauhan.jpeg",
+          email: "chandnichauhan443@gmail.com",
+          phone: "+91 8979288628",
           bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance."
         }
       ]);
@@ -176,11 +197,49 @@ export const AdminDemo: React.FC = () => {
     }
   };
 
+  // Load Gallery Items
+  const loadGalleryItems = async () => {
+    setGalleryLoading(true);
+    setGalleryError('');
+    try {
+      const res = await fetch('http://localhost:5000/api/gallery');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          setGalleryItems(json.data);
+        } else {
+          setGalleryError(json.error || 'Failed to retrieve gallery items');
+        }
+      } else {
+        setGalleryError(`Backend returned status ${res.status}`);
+      }
+    } catch (err) {
+      setGalleryError('Server offline. Using local gallery memory.');
+      setGalleryItems([
+        {
+          _id: 'mock_gal_1',
+          title: "Educational Support Distribution",
+          description: "Providing learning materials and kits to children at community centers.",
+          imageUrl: "/wall1.jpg"
+        },
+        {
+          _id: 'mock_gal_2',
+          title: "Community Outreach",
+          description: "Helping build robust community operations and supportive networks.",
+          imageUrl: "/mrs.chandni chauhan.jpeg"
+        }
+      ]);
+    } finally {
+      setGalleryLoading(false);
+    }
+  };
+
   // Trigger loading when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       loadInquiries();
       loadEmployees();
+      loadGalleryItems();
     }
   }, [isAuthenticated]);
 
@@ -203,7 +262,7 @@ export const AdminDemo: React.FC = () => {
     setPasswordInput('');
   };
 
-  // Handle Photo File Upload -> Base64
+  // Handle Photo File Upload -> Base64 for Employees
   const handlePhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -218,6 +277,26 @@ export const AdminDemo: React.FC = () => {
       };
       reader.onerror = () => {
         setAddMessage({ type: 'error', text: 'Failed to read image file.' });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Handle File Upload -> Base64 for Gallery
+  const handleGalleryFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        setGalMessage({ type: 'error', text: 'Image file size must be less than 2MB.' });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setGalImageUrl(reader.result as string);
+        setGalMessage({ type: 'success', text: 'Image processed successfully.' });
+      };
+      reader.onerror = () => {
+        setGalMessage({ type: 'error', text: 'Failed to read image file.' });
       };
       reader.readAsDataURL(file);
     }
@@ -252,7 +331,6 @@ export const AdminDemo: React.FC = () => {
       const json = await res.json();
       if (res.ok && json.success) {
         setAddMessage({ type: 'success', text: 'Employee profile added successfully!' });
-        // Reset form inputs
         setEmpName('');
         setEmpRole('');
         setEmpCategory('employee');
@@ -260,14 +338,11 @@ export const AdminDemo: React.FC = () => {
         setEmpEmail('');
         setEmpPhone('');
         setEmpBio('');
-        
-        // Reload list
         await loadEmployees();
       } else {
         setAddMessage({ type: 'error', text: json.error || 'Failed to save employee profile.' });
       }
     } catch (err) {
-      // Offline fallback handling
       const newMockEmp: Employee = {
         _id: 'mock_emp_' + Math.random().toString(36).substr(2, 9),
         name: empName,
@@ -280,8 +355,6 @@ export const AdminDemo: React.FC = () => {
       };
       setEmployees(prev => [...prev, newMockEmp]);
       setAddMessage({ type: 'success', text: 'Backend offline: Added employee to frontend memory.' });
-      
-      // Reset form inputs
       setEmpName('');
       setEmpRole('');
       setEmpCategory('employee');
@@ -312,9 +385,80 @@ export const AdminDemo: React.FC = () => {
         alert(json.error || 'Failed to delete employee profile.');
       }
     } catch (err) {
-      // Offline fallback handling
       setEmployees(prev => prev.filter(emp => emp._id !== id));
       alert('Backend offline: Removed employee from frontend memory.');
+    }
+  };
+
+  // Add Gallery Item Submit
+  const handleAddGalleryItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!galImageUrl) {
+      setGalMessage({ type: 'error', text: 'Please choose an image file or provide a photo URL.' });
+      return;
+    }
+
+    setIsAddingGal(true);
+    setGalMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('http://localhost:5000/api/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: galTitle,
+          description: galDescription,
+          imageUrl: galImageUrl
+        })
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setGalMessage({ type: 'success', text: 'Gallery photo added successfully!' });
+        setGalTitle('');
+        setGalDescription('');
+        setGalImageUrl('');
+        await loadGalleryItems();
+      } else {
+        setGalMessage({ type: 'error', text: json.error || 'Failed to save gallery item.' });
+      }
+    } catch (err) {
+      const newMockGal: GalleryItem = {
+        _id: 'mock_gal_' + Math.random().toString(36).substr(2, 9),
+        title: galTitle,
+        description: galDescription,
+        imageUrl: galImageUrl
+      };
+      setGalleryItems(prev => [newMockGal, ...prev]);
+      setGalMessage({ type: 'success', text: 'Backend offline: Added photo to frontend memory.' });
+      setGalTitle('');
+      setGalDescription('');
+      setGalImageUrl('');
+    } finally {
+      setIsAddingGal(false);
+    }
+  };
+
+  // Delete Gallery Item
+  const handleDeleteGalleryItem = async (id: string | undefined) => {
+    if (!id) return;
+    if (!window.confirm(`Are you sure you want to delete this image from the gallery?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/gallery/${id}`, {
+        method: 'DELETE'
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        await loadGalleryItems();
+      } else {
+        alert(json.error || 'Failed to delete gallery photo.');
+      }
+    } catch (err) {
+      setGalleryItems(prev => prev.filter(item => item._id !== id));
+      alert('Backend offline: Removed image from frontend memory.');
     }
   };
 
@@ -402,6 +546,13 @@ export const AdminDemo: React.FC = () => {
               >
                 <Users size={18} />
                 <span>Manage Team</span>
+              </button>
+              <button 
+                className={`tab-toggle-btn ${activeTab === 'gallery' ? 'active' : ''}`}
+                onClick={() => setActiveTab('gallery')}
+              >
+                <ImageIcon size={18} />
+                <span>Manage Gallery</span>
               </button>
               <button 
                 className={`tab-toggle-btn ${activeTab === 'inquiries' ? 'active' : ''}`}
@@ -632,7 +783,154 @@ export const AdminDemo: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 2: CONTACT INQUIRIES LOG SHEET (Existing Admin View) */}
+          {/* TAB 2: GALLERY ACCESS MANAGEMENT PANEL */}
+          {activeTab === 'gallery' && (
+            <div className="admin-management-layout">
+              
+              {/* Left Column: Form to Upload Gallery Photos */}
+              <div className="glass-card panel-form-card">
+                <div className="form-card-header">
+                  <Plus size={22} className="header-icon-primary" />
+                  <h3>Upload Gallery Image</h3>
+                </div>
+
+                <form onSubmit={handleAddGalleryItem} className="add-emp-form">
+                  <div className="form-group">
+                    <label className="form-label">Image Title / Caption</label>
+                    <input 
+                      type="text"
+                      className="form-input"
+                      placeholder="e.g. Distribution Camp 2026"
+                      value={galTitle}
+                      onChange={(e) => setGalTitle(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Image File Upload (Max 2MB)</label>
+                    <div className="file-input-wrapper">
+                      <Upload size={16} />
+                      <span>Choose Image File</span>
+                      <input 
+                        type="file"
+                        accept="image/*"
+                        className="file-input-hidden"
+                        onChange={handleGalleryFileChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Or Image URL</label>
+                    <input 
+                      type="text"
+                      className="form-input"
+                      placeholder="https://example.com/photo.jpg"
+                      value={galImageUrl}
+                      onChange={(e) => setGalImageUrl(e.target.value)}
+                    />
+                  </div>
+
+                  {galImageUrl && (
+                    <div className="photo-preview-container">
+                      <img src={galImageUrl} alt="Gallery Preview" className="photo-preview-image" style={{ width: '80px', height: '80px', borderRadius: '4px', objectFit: 'cover' }} />
+                      <button 
+                        type="button" 
+                        className="btn-preview-delete" 
+                        onClick={() => setGalImageUrl('')}
+                      >
+                        Clear Image
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="form-group">
+                    <label className="form-label">Image Description / Context</label>
+                    <textarea 
+                      className="form-input form-textarea"
+                      placeholder="Describe the activity, event, or resources shown..."
+                      rows={4}
+                      value={galDescription}
+                      onChange={(e) => setGalDescription(e.target.value)}
+                    />
+                  </div>
+
+                  {galMessage.text && (
+                    <div className={`form-feedback-message ${galMessage.type}`}>
+                      {galMessage.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+                      <span>{galMessage.text}</span>
+                    </div>
+                  )}
+
+                  <button type="submit" className="btn btn-primary btn-block" disabled={isAddingGal}>
+                    {isAddingGal ? (
+                      <>
+                        <RefreshCw className="spinner" size={16} />
+                        <span>Uploading photo...</span>
+                      </>
+                    ) : (
+                      <span>Upload Gallery Photo</span>
+                    )}
+                  </button>
+                </form>
+              </div>
+
+              {/* Right Column: Existing Gallery Catalog */}
+              <div className="glass-card panel-list-card">
+                <div className="list-card-header">
+                  <div className="header-left">
+                    <ImageIcon size={22} className="header-icon-secondary" />
+                    <h3>Live Gallery Archive ({galleryItems.length})</h3>
+                  </div>
+                  <button className="btn btn-outline btn-refresh-list" onClick={loadGalleryItems} title="Reload list">
+                    <RefreshCw size={14} />
+                  </button>
+                </div>
+
+                {galleryLoading ? (
+                  <div className="loader-container">
+                    <RefreshCw className="spinner" size={32} />
+                    <p>Fetching catalog...</p>
+                  </div>
+                ) : galleryError && galleryItems.length === 0 ? (
+                  <div className="error-list-box">
+                    <AlertCircle size={32} />
+                    <p>{galleryError}</p>
+                  </div>
+                ) : galleryItems.length === 0 ? (
+                  <div className="empty-list-box">
+                    <AlertCircle size={32} />
+                    <p>No gallery images uploaded yet. Use the upload panel.</p>
+                  </div>
+                ) : (
+                  <div className="employee-list-grid">
+                    {galleryItems.map((item) => (
+                      <div key={item._id} className="admin-emp-card">
+                        <img src={item.imageUrl} alt={item.title || "Gallery"} className="admin-emp-photo" style={{ width: '80px', height: '80px', borderRadius: '4px', objectFit: 'cover' }} />
+                        <div className="admin-emp-info" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                          <h4 className="admin-emp-name" style={{ fontSize: '0.95rem' }}>{item.title || "Activity photo"}</h4>
+                          <p className="admin-emp-role" style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginTop: '4px', lineHeight: '1.4' }}>
+                            {item.description ? (item.description.length > 50 ? `${item.description.substring(0, 50)}...` : item.description) : "No description"}
+                          </p>
+                        </div>
+
+                        <button 
+                          className="btn-delete-emp"
+                          onClick={() => handleDeleteGalleryItem(item._id)}
+                          title="Delete photo"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+            </div>
+          )}
+
+          {/* TAB 3: CONTACT INQUIRIES LOG SHEET (Existing Admin View) */}
           {activeTab === 'inquiries' && (
             <>
               <div className="grid-2 admin-top-grid">

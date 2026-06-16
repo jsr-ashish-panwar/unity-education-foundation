@@ -1,40 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, User, Loader2, Maximize2, X } from 'lucide-react';
+import { Loader2, Maximize2, X, Image as ImageIcon } from 'lucide-react';
 
-interface Employee {
+interface GalleryItem {
   _id?: string;
-  name: string;
-  role: string;
-  category: 'director' | 'secretary' | 'employee';
-  photoUrl?: string;
-  email?: string;
-  phone?: string;
-  bio?: string;
+  title?: string;
+  description?: string;
+  imageUrl: string;
+  createdAt?: string | Date;
 }
 
 export const Gallery: React.FC = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedEmp, setSelectedEmp] = useState<Employee | null>(null);
+  const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
+    const fetchGallery = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/employees');
+        const res = await fetch('http://localhost:5000/api/gallery');
         if (res.ok) {
           const json = await res.json();
-          if (json.success && json.data.length > 0) {
-            setEmployees(json.data);
+          if (json.success) {
+            setItems(json.data);
           }
         }
       } catch (err) {
-        console.log("Backend offline, using fallback local storage.");
+        console.log("Backend offline, using fallback data.");
+        setItems([
+          {
+            _id: 'fallback_1',
+            title: "Educational Support Distribution",
+            description: "Providing learning materials and kits to children at community centers.",
+            imageUrl: "/wall1.jpg"
+          },
+          {
+            _id: 'fallback_2',
+            title: "Community Outreach",
+            description: "Helping build robust community operations and supportive networks.",
+            imageUrl: "/mrs.chandni chauhan.jpeg"
+          }
+        ]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchEmployees();
+    fetchGallery();
   }, []);
 
   return (
@@ -47,8 +58,8 @@ export const Gallery: React.FC = () => {
       <section className="gallery-hero hero-wallpaper-bg">
         <div className="container text-center">
           <span className="sub-tag">OUR ARCHIVE</span>
-          <h1 className="sub-title">Resource & Team Gallery</h1>
-          <p className="sub-desc">A visual directory showcasing our operational professionals, administrative staff, and resource team.</p>
+          <h1 className="sub-title">Resource & Activity Gallery</h1>
+          <p className="sub-desc">A visual showcase of community operations, educational seminars, and field workshops.</p>
         </div>
       </section>
 
@@ -60,44 +71,37 @@ export const Gallery: React.FC = () => {
               <Loader2 className="spinner" size={40} />
               <p>Loading photo archive...</p>
             </div>
-          ) : employees.length === 0 ? (
+          ) : items.length === 0 ? (
             <div className="empty-gallery text-center">
-              <User size={60} className="empty-icon" />
-              <h3>No Profile Images Found</h3>
-              <p>Register members via the admin console to display them here.</p>
+              <ImageIcon size={60} className="empty-icon" />
+              <h3>No Gallery Images Found</h3>
+              <p>Upload new photos via the admin console to display them here.</p>
             </div>
           ) : (
             <div className="gallery-grid">
-              {employees.map((emp, idx) => (
+              {items.map((item, idx) => (
                 <div 
-                  key={emp._id || idx} 
+                  key={item._id || idx} 
                   className="gallery-item-wrapper animate-slide-up"
                   style={{ animationDelay: `${idx * 80}ms` }}
-                  onClick={() => setSelectedEmp(emp)}
+                  onClick={() => setSelectedItem(item)}
                 >
                   <div className="gallery-card glass-card">
                     <div className="gallery-photo-box">
-                      {emp.photoUrl ? (
-                        <img src={emp.photoUrl} alt={emp.name} className="gallery-img" />
-                      ) : (
-                        <div className="gallery-placeholder">
-                          <User size={48} />
-                        </div>
-                      )}
+                      <img src={item.imageUrl} alt={item.title || "Gallery Item"} className="gallery-img" />
                       <div className="gallery-hover-overlay">
                         <div className="zoom-icon-box">
                           <Maximize2 size={20} />
                         </div>
                       </div>
-                      <span className={`gallery-badge-role badge-category-${emp.category}`}>
-                        {emp.category === 'director' ? 'Director' : emp.category === 'secretary' ? 'Secretary' : 'Staff'}
-                      </span>
                     </div>
                     
-                    <div className="gallery-info">
-                      <h3 className="gallery-name">{emp.name}</h3>
-                      <p className="gallery-designation">{emp.role}</p>
-                    </div>
+                    {(item.title || item.description) && (
+                      <div className="gallery-info">
+                        <h3 className="gallery-name">{item.title || "Activity Showcase"}</h3>
+                        <p className="gallery-designation">{item.description ? (item.description.length > 50 ? `${item.description.substring(0, 50)}...` : item.description) : ""}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -107,58 +111,30 @@ export const Gallery: React.FC = () => {
       </section>
 
       {/* Lightbox / Modal */}
-      {selectedEmp && (
-        <div className="lightbox-overlay" onClick={() => setSelectedEmp(null)}>
+      {selectedItem && (
+        <div className="lightbox-overlay" onClick={() => setSelectedItem(null)}>
           <div className="lightbox-modal glass-card animate-scale-up" onClick={(e) => e.stopPropagation()}>
-            <button className="lightbox-close-btn" onClick={() => setSelectedEmp(null)}>
+            <button className="lightbox-close-btn" onClick={() => setSelectedItem(null)}>
               <X size={24} />
             </button>
             
             <div className="lightbox-content-grid">
               <div className="lightbox-image-column">
-                {selectedEmp.photoUrl ? (
-                  <img src={selectedEmp.photoUrl} alt={selectedEmp.name} className="lightbox-big-img" />
-                ) : (
-                  <div className="lightbox-placeholder">
-                    <User size={80} />
-                  </div>
-                )}
+                <img src={selectedItem.imageUrl} alt={selectedItem.title || "Gallery Item"} className="lightbox-big-img" />
               </div>
               
               <div className="lightbox-info-column">
-                <span className={`lightbox-tag badge-category-${selectedEmp.category}`}>
-                  {selectedEmp.category.toUpperCase()}
+                <span className="lightbox-tag badge-category-employee">
+                  GALLERY IMAGE
                 </span>
-                <h2 className="lightbox-name">{selectedEmp.name}</h2>
-                <h4 className="lightbox-role">{selectedEmp.role}</h4>
+                <h2 className="lightbox-name">{selectedItem.title || "Activity Showcase"}</h2>
                 
-                {selectedEmp.bio && (
-                  <div className="lightbox-bio-section">
-                    <h5>Biography</h5>
-                    <p className="lightbox-bio-text">{selectedEmp.bio}</p>
+                {selectedItem.description && (
+                  <div className="lightbox-bio-section" style={{ marginTop: '16px' }}>
+                    <h5>Description</h5>
+                    <p className="lightbox-bio-text">{selectedItem.description}</p>
                   </div>
                 )}
-                
-                <div className="lightbox-contact-section">
-                  <h5>Contact Details</h5>
-                  <div className="lightbox-contact-links">
-                    {selectedEmp.email ? (
-                      <a href={`mailto:${selectedEmp.email}`} className="lightbox-link">
-                        <Mail size={16} /> <span>{selectedEmp.email}</span>
-                      </a>
-                    ) : (
-                      <span className="no-contact-text">No email provided</span>
-                    )}
-                    
-                    {selectedEmp.phone ? (
-                      <a href={`tel:${selectedEmp.phone}`} className="lightbox-link">
-                        <Phone size={16} /> <span>{selectedEmp.phone}</span>
-                      </a>
-                    ) : (
-                      <span className="no-contact-text">No phone number provided</span>
-                    )}
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -210,7 +186,7 @@ export const Gallery: React.FC = () => {
         /* Showcase Grid styling */
         .gallery-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(3, 1fr);
           gap: 28px;
           margin-top: 20px;
         }
@@ -275,15 +251,6 @@ export const Gallery: React.FC = () => {
           transform: scale(1.06);
         }
 
-        .gallery-placeholder {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--text-light);
-        }
-
         .gallery-hover-overlay {
           position: absolute;
           top: 0;
@@ -321,33 +288,6 @@ export const Gallery: React.FC = () => {
           transform: scale(1);
         }
 
-        .gallery-badge-role {
-          position: absolute;
-          bottom: 12px;
-          left: 12px;
-          font-family: var(--font-heading);
-          font-size: 0.7rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          padding: 4px 10px;
-          border-radius: var(--radius-sm);
-          color: white;
-          letter-spacing: 0.5px;
-          z-index: 5;
-        }
-
-        .badge-category-director {
-          background-color: var(--primary);
-        }
-
-        .badge-category-secretary {
-          background-color: var(--secondary-dark);
-        }
-
-        .badge-category-employee {
-          background-color: var(--accent);
-        }
-
         .gallery-info {
           padding: 20px;
           text-align: center;
@@ -363,12 +303,14 @@ export const Gallery: React.FC = () => {
           color: var(--primary-dark);
           margin-bottom: 4px;
           line-height: 1.3;
+          font-family: var(--font-heading);
+          font-weight: 700;
         }
 
         .gallery-designation {
           font-size: 0.85rem;
           color: var(--text-secondary);
-          font-weight: 600;
+          line-height: 1.5;
         }
 
         /* Lightbox popup styling */
@@ -423,7 +365,7 @@ export const Gallery: React.FC = () => {
 
         .lightbox-content-grid {
           display: grid;
-          grid-template-columns: 1fr 1.3fr;
+          grid-template-columns: 1.2fr 1fr;
           gap: 32px;
           align-items: start;
         }
@@ -442,7 +384,7 @@ export const Gallery: React.FC = () => {
 
         .lightbox-image-column {
           width: 100%;
-          height: 320px;
+          height: 360px;
           border-radius: var(--radius-sm);
           overflow: hidden;
           background-color: var(--bg-tertiary);
@@ -459,15 +401,6 @@ export const Gallery: React.FC = () => {
           width: 100%;
           height: 100%;
           object-fit: cover;
-        }
-
-        .lightbox-placeholder {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--text-light);
         }
 
         .lightbox-info-column {
@@ -487,25 +420,23 @@ export const Gallery: React.FC = () => {
           margin-bottom: 12px;
         }
 
+        .badge-category-employee {
+          background-color: var(--accent);
+        }
+
         .lightbox-name {
-          font-size: 1.8rem;
+          font-size: 1.6rem;
           color: var(--primary-dark);
           margin-bottom: 4px;
+          font-family: var(--font-heading);
+          font-weight: 800;
         }
 
-        .lightbox-role {
-          font-size: 1rem;
-          font-weight: 600;
-          color: var(--secondary);
-          margin-bottom: 24px;
-        }
-
-        .lightbox-bio-section, .lightbox-contact-section {
+        .lightbox-bio-section {
           width: 100%;
-          margin-bottom: 20px;
         }
 
-        .lightbox-bio-section h5, .lightbox-contact-section h5 {
+        .lightbox-bio-section h5 {
           font-family: var(--font-heading);
           font-size: 0.85rem;
           text-transform: uppercase;
@@ -520,32 +451,6 @@ export const Gallery: React.FC = () => {
           font-size: 0.95rem;
           color: var(--text-secondary);
           line-height: 1.6;
-        }
-
-        .lightbox-contact-links {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .lightbox-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 0.9rem;
-          color: var(--text-secondary);
-          transition: all 0.2s ease;
-        }
-
-        .lightbox-link:hover {
-          color: var(--secondary);
-          transform: translateX(4px);
-        }
-
-        .no-contact-text {
-          font-size: 0.85rem;
-          color: var(--text-light);
-          font-style: italic;
         }
       `}</style>
     </div>
