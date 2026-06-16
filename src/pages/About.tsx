@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Target, 
-  Eye, 
-  ShieldCheck, 
-  Zap, 
-  Award, 
-  ThumbsUp, 
-  Activity, 
-  CheckCircle, 
-  Clock, 
-  Mail, 
-  Phone, 
-  User, 
+import {
+  Target,
+  Eye,
+  ShieldCheck,
+  Zap,
+  Award,
+  ThumbsUp,
+  Activity,
+  CheckCircle,
+  Clock,
+  Mail,
+  Phone,
+  User,
   Loader2,
   X
 } from 'lucide-react';
@@ -56,7 +56,7 @@ export const About: React.FC = () => {
           },
           {
             name: "Mrs. Chandni Chauhan",
-            role: "Executive Secretary",
+            role: "Secretary",
             category: "secretary",
             photoUrl: "/mrs.chandni chauhan.jpeg",
             email: "chandnichauhan443@gmail.com",
@@ -183,7 +183,7 @@ export const About: React.FC = () => {
               To provide reliable, efficient, and innovative operational support services that enable organizations to achieve sustainable growth, improve productivity, and maintain excellence in performance.
             </p>
           </div>
-          
+
           <div className="detail-card glass-card">
             <div className="icon-wrapper secondary-bg">
               <Eye size={30} />
@@ -344,7 +344,7 @@ export const About: React.FC = () => {
             <button className="lightbox-close-btn" onClick={() => setSelectedLeader(null)}>
               <X size={24} />
             </button>
-            
+
             <div className="lightbox-content-grid">
               <div className="lightbox-image-column">
                 {selectedLeader.photoUrl ? (
@@ -355,21 +355,21 @@ export const About: React.FC = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="lightbox-info-column">
                 <span className={`lightbox-tag badge-category-${selectedLeader.category}`}>
                   {selectedLeader.category === 'director' ? 'Managing Director' : 'Executive Secretary'}
                 </span>
                 <h2 className="lightbox-name">{selectedLeader.name}</h2>
                 <h4 className="lightbox-role">{selectedLeader.role}</h4>
-                
+
                 {selectedLeader.bio && (
                   <div className="lightbox-bio-section">
                     <h5>Biography</h5>
                     <p className="lightbox-bio-text">{selectedLeader.bio}</p>
                   </div>
                 )}
-                
+
                 <div className="lightbox-contact-section">
                   <h5>Contact Details</h5>
                   <div className="lightbox-contact-links">
@@ -380,7 +380,7 @@ export const About: React.FC = () => {
                     ) : (
                       <span className="no-contact-text">No email provided</span>
                     )}
-                    
+
                     {selectedLeader.phone ? (
                       <a href={`tel:${selectedLeader.phone}`} className="lightbox-link">
                         <Phone size={16} /> <span>{selectedLeader.phone}</span>
