@@ -88,7 +88,7 @@ const seedIfEmpty = async () => {
 };
 
 // Middleware to establish database connection on every function invocation
-app.use(async (req, res, next) => {
+app.use(async (req: Request, res: Response, next: express.NextFunction) => {
   try {
     await connectDB();
     await seedIfEmpty();
