@@ -1,7 +1,77 @@
-import React from 'react';
-import { Target, Eye, ShieldCheck, Zap, Award, ThumbsUp, Activity, CheckCircle, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { 
+  Target, 
+  Eye, 
+  ShieldCheck, 
+  Zap, 
+  Award, 
+  ThumbsUp, 
+  Activity, 
+  CheckCircle, 
+  Clock, 
+  Mail, 
+  Phone, 
+  User, 
+  Loader2 
+} from 'lucide-react';
+
+interface Employee {
+  _id?: string;
+  name: string;
+  role: string;
+  category: 'director' | 'secretary' | 'employee';
+  photoUrl?: string;
+  email?: string;
+  phone?: string;
+  bio?: string;
+}
 
 export const About: React.FC = () => {
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/employees');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success) {
+            setEmployees(json.data);
+          }
+        }
+      } catch (err) {
+        console.log("Offline fallback. Using fallback leadership info.");
+        setEmployees([
+          {
+            name: "Dr. Alok Sharma",
+            role: "Managing Director",
+            category: "director",
+            photoUrl: "/assets/director.webp",
+            email: "alok.sharma@unityeducation.org",
+            phone: "+91 9557558628",
+            bio: "Over 15 years of leadership in educational administration and community operational development."
+          },
+          {
+            name: "Mrs. Sunita Siwach",
+            role: "Executive Secretary",
+            category: "secretary",
+            photoUrl: "/assets/secretary.webp",
+            email: "sunita.siwach@unityeducation.org",
+            phone: "+91 9557558628",
+            bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance."
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEmployees();
+  }, []);
+
+  const directors = employees.filter(e => e.category === 'director');
+  const secretaries = employees.filter(e => e.category === 'secretary');
+
   const whyChooseUs = [
     {
       title: "Experienced Professionals",
@@ -124,6 +194,98 @@ export const About: React.FC = () => {
         </div>
       </section>
 
+      {/* Leadership Spotlight Section */}
+      <section className="section leadership-section">
+        <div className="container">
+          <div className="section-header text-center">
+            <span className="section-tag">LEADERSHIP BOARD</span>
+            <h2 className="section-title">Directors & Administrators</h2>
+            <p className="section-desc">
+              Guiding our operations, building strategic partnerships, and maintaining excellence across all levels of administration.
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="loader-container">
+              <Loader2 className="spinner" size={40} />
+              <p>Loading profiles...</p>
+            </div>
+          ) : (
+            <div className="leadership-cards-container">
+              {/* Director Card */}
+              {directors.map((dir, idx) => (
+                <div
+                  key={idx}
+                  className="leader-card glass-card spotlight-card animate-slide-up"
+                  style={{ animationDelay: `${idx * 150}ms` }}
+                >
+                  <div className="leader-photo-container">
+                    {dir.photoUrl ? (
+                      <img src={dir.photoUrl} alt={dir.name} className="leader-photo" />
+                    ) : (
+                      <div className="photo-placeholder"><User size={60} /></div>
+                    )}
+                    <span className="badge-role badge-director">Managing Director</span>
+                  </div>
+                  <div className="leader-info">
+                    <h3 className="leader-name">{dir.name}</h3>
+                    <p className="leader-role-text">{dir.role}</p>
+                    <p className="leader-bio">{dir.bio}</p>
+                    <div className="leader-contact-info">
+                      {dir.email && (
+                        <a href={`mailto:${dir.email}`} className="contact-link">
+                          <Mail size={16} /> <span>{dir.email}</span>
+                        </a>
+                      )}
+                      {dir.phone && (
+                        <a href={`tel:${dir.phone}`} className="contact-link">
+                          <Phone size={16} /> <span>{dir.phone}</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Secretary Card */}
+              {secretaries.map((sec, idx) => (
+                <div
+                  key={idx}
+                  className="leader-card glass-card spotlight-card animate-slide-up"
+                  style={{ animationDelay: `${(idx + directors.length) * 150}ms` }}
+                >
+                  <div className="leader-photo-container">
+                    {sec.photoUrl ? (
+                      <img src={sec.photoUrl} alt={sec.name} className="leader-photo" />
+                    ) : (
+                      <div className="photo-placeholder"><User size={60} /></div>
+                    )}
+                    <span className="badge-role badge-secretary">Executive Secretary</span>
+                  </div>
+                  <div className="leader-info">
+                    <h3 className="leader-name">{sec.name}</h3>
+                    <p className="leader-role-text">{sec.role}</p>
+                    <p className="leader-bio">{sec.bio}</p>
+                    <div className="leader-contact-info">
+                      {sec.email && (
+                        <a href={`mailto:${sec.email}`} className="contact-link">
+                          <Mail size={16} /> <span>{sec.email}</span>
+                        </a>
+                      )}
+                      {sec.phone && (
+                        <a href={`tel:${sec.phone}`} className="contact-link">
+                          <Phone size={16} /> <span>{sec.phone}</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Why Choose Us */}
       <section className="section why-choose-section">
         <div className="container">
@@ -138,7 +300,7 @@ export const About: React.FC = () => {
           <div className="why-grid">
             {whyChooseUs.map((item, idx) => (
               <div
-                key={idx}
+                key={item.title}
                 className="why-card glass-card animate-slide-up"
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
@@ -296,6 +458,144 @@ export const About: React.FC = () => {
           line-height: 1.7;
         }
 
+        /* Leadership Spotlight Styles */
+        .loader-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 60px 0;
+          color: var(--text-secondary);
+        }
+
+        .spinner {
+          animation: spin 1s linear infinite;
+          margin-bottom: 12px;
+          color: var(--primary);
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        .leadership-cards-container {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 32px;
+          margin-top: 40px;
+          margin-bottom: 60px;
+        }
+
+        .leader-card {
+          display: flex;
+          gap: 24px;
+          align-items: stretch;
+          padding: 24px;
+          border-top: 4px solid var(--secondary);
+          text-align: left;
+        }
+
+        .leader-photo-container {
+          position: relative;
+          flex-shrink: 0;
+          width: 160px;
+          height: 200px;
+          border-radius: var(--radius-sm);
+          overflow: hidden;
+          box-shadow: var(--shadow-sm);
+        }
+
+        .leader-photo {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: var(--transition-normal);
+        }
+
+        .leader-card:hover .leader-photo {
+          transform: scale(1.05);
+        }
+
+        .photo-placeholder {
+          width: 100%;
+          height: 100%;
+          background-color: var(--bg-tertiary);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--text-light);
+        }
+
+        .badge-role {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          text-align: center;
+          padding: 6px 0;
+          font-family: var(--font-heading);
+          font-size: 0.75rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          color: white;
+          z-index: 5;
+        }
+
+        .badge-director {
+          background-color: var(--primary);
+        }
+
+        .badge-secretary {
+          background-color: var(--secondary);
+        }
+
+        .leader-info {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          flex-grow: 1;
+        }
+
+        .leader-name {
+          font-size: 1.5rem;
+          margin-bottom: 4px;
+        }
+
+        .leader-role-text {
+          font-family: var(--font-heading);
+          font-weight: 600;
+          color: var(--secondary);
+          font-size: 0.95rem;
+          margin-bottom: 12px;
+        }
+
+        .leader-bio {
+          font-size: 0.95rem;
+          color: var(--text-secondary);
+          margin-bottom: 16px;
+          line-height: 1.5;
+        }
+
+        .leader-contact-info {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .contact-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.9rem;
+          color: var(--text-secondary);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .contact-link:hover {
+          color: var(--secondary);
+          transform: translateX(4px);
+        }
+
         /* Why choose grid */
         .why-grid {
           display: grid;
@@ -370,6 +670,9 @@ export const About: React.FC = () => {
           .why-grid {
             grid-template-columns: 1fr;
           }
+          .leadership-cards-container {
+            grid-template-columns: 1fr;
+          }
         }
 
         @media (max-width: 768px) {
@@ -381,6 +684,22 @@ export const About: React.FC = () => {
           }
           .commitment-container {
             padding: 30px 20px;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .leader-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+          .leader-photo-container {
+            width: 180px;
+            height: 225px;
+            margin: 0 auto;
+          }
+          .leader-contact-info {
+            align-items: center;
           }
         }
 

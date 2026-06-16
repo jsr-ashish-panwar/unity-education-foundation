@@ -41,7 +41,7 @@ export const Footer: React.FC = () => {
               <Link to="/services"><ArrowRight size={14} /> Services</Link>
             </li>
             <li>
-              <Link to="/team"><ArrowRight size={14} /> Our Team</Link>
+              <Link to="/gallery"><ArrowRight size={14} /> Gallery</Link>
             </li>
             <li>
               <Link to="/contact"><ArrowRight size={14} /> Contact Us</Link>
