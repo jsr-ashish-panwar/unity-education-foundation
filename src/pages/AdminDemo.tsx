@@ -48,6 +48,48 @@ interface GalleryItem {
   createdAt?: string | Date;
 }
 
+const compressImage = (file: File, maxWidth: number, maxHeight: number, quality: number): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas context not available'));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedBase64);
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
+
 export const AdminDemo: React.FC = () => {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -264,42 +306,32 @@ export const AdminDemo: React.FC = () => {
   };
 
   // Handle Photo File Upload -> Base64 for Employees
-  const handlePhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        setAddMessage({ type: 'error', text: 'Image file size must be less than 2MB.' });
-        return;
+      setAddMessage({ type: 'success', text: 'Compressing image...' });
+      try {
+        const compressed = await compressImage(file, 400, 500, 0.7);
+        setEmpPhotoUrl(compressed);
+        setAddMessage({ type: 'success', text: 'Image optimized successfully!' });
+      } catch (err) {
+        setAddMessage({ type: 'error', text: 'Failed to optimize image.' });
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setEmpPhotoUrl(reader.result as string);
-        setAddMessage({ type: 'success', text: 'Image processed successfully.' });
-      };
-      reader.onerror = () => {
-        setAddMessage({ type: 'error', text: 'Failed to read image file.' });
-      };
-      reader.readAsDataURL(file);
     }
   };
 
   // Handle File Upload -> Base64 for Gallery
-  const handleGalleryFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        setGalMessage({ type: 'error', text: 'Image file size must be less than 2MB.' });
-        return;
+      setGalMessage({ type: 'success', text: 'Compressing image...' });
+      try {
+        const compressed = await compressImage(file, 800, 600, 0.7);
+        setGalImageUrl(compressed);
+        setGalMessage({ type: 'success', text: 'Image optimized successfully!' });
+      } catch (err) {
+        setGalMessage({ type: 'error', text: 'Failed to optimize image.' });
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setGalImageUrl(reader.result as string);
-        setGalMessage({ type: 'success', text: 'Image processed successfully.' });
-      };
-      reader.onerror = () => {
-        setGalMessage({ type: 'error', text: 'Failed to read image file.' });
-      };
-      reader.readAsDataURL(file);
     }
   };
 
