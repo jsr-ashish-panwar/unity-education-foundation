@@ -30,12 +30,12 @@ const defaultEmployees = [
     order: 1
   },
   {
-    name: "Mrs. Sunita Siwach",
+    name: "Mrs. Chandni Chauhan",
     role: "Executive Secretary",
     category: "secretary",
-    photoUrl: "/assets/secretary.webp",
-    email: "sunita.siwach@unityeducation.org",
-    phone: "+91 9557558628",
+    photoUrl: "/mrs.chandni chauhan.jpeg",
+    email: "chandnichauhan443@gmail.com",
+    phone: "+91 8979288628",
     bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance.",
     order: 2
   }
@@ -57,6 +57,17 @@ const initDB = async () => {
       } else if (count === 8) {
         console.log('Migration: Found 8 employees in Atlas (old seed). Deleting 6 staff members to match new requirements.');
         await Employee.deleteMany({ category: 'employee' });
+      }
+
+      // Check if Sunita Siwach exists and update to Chandni Chauhan
+      const sunita = await Employee.findOne({ name: "Mrs. Sunita Siwach" });
+      if (sunita) {
+        console.log('Migration: Updating Mrs. Sunita Siwach to Mrs. Chandni Chauhan in MongoDB.');
+        sunita.name = "Mrs. Chandni Chauhan";
+        sunita.photoUrl = "/mrs.chandni chauhan.jpeg";
+        sunita.email = "chandnichauhan443@gmail.com";
+        sunita.phone = "+91 8979288628";
+        await sunita.save();
       }
     } catch (err) {
       console.error('Error seeding default employees:', err);

@@ -12,7 +12,8 @@ import {
   Mail, 
   Phone, 
   User, 
-  Loader2 
+  Loader2,
+  X
 } from 'lucide-react';
 
 interface Employee {
@@ -29,6 +30,7 @@ interface Employee {
 export const About: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedLeader, setSelectedLeader] = useState<Employee | null>(null);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -53,12 +55,12 @@ export const About: React.FC = () => {
             bio: "Over 15 years of leadership in educational administration and community operational development."
           },
           {
-            name: "Mrs. Sunita Siwach",
+            name: "Mrs. Chandni Chauhan",
             role: "Executive Secretary",
             category: "secretary",
-            photoUrl: "/assets/secretary.webp",
-            email: "sunita.siwach@unityeducation.org",
-            phone: "+91 9557558628",
+            photoUrl: "/mrs.chandni chauhan.jpeg",
+            email: "chandnichauhan443@gmail.com",
+            phone: "+91 8979288628",
             bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance."
           }
         ]);
@@ -201,7 +203,7 @@ export const About: React.FC = () => {
             <span className="section-tag">LEADERSHIP BOARD</span>
             <h2 className="section-title">Directors & Administrators</h2>
             <p className="section-desc">
-              Guiding our operations, building strategic partnerships, and maintaining excellence across all levels of administration.
+              Guiding our operations, building strategic partnerships, and maintaining excellence across all levels of administration. Click on profiles to view details.
             </p>
           </div>
 
@@ -218,6 +220,7 @@ export const About: React.FC = () => {
                   key={idx}
                   className="leader-card glass-card spotlight-card animate-slide-up"
                   style={{ animationDelay: `${idx * 150}ms` }}
+                  onClick={() => setSelectedLeader(dir)}
                 >
                   <div className="leader-photo-container">
                     {dir.photoUrl ? (
@@ -233,14 +236,14 @@ export const About: React.FC = () => {
                     <p className="leader-bio">{dir.bio}</p>
                     <div className="leader-contact-info">
                       {dir.email && (
-                        <a href={`mailto:${dir.email}`} className="contact-link">
+                        <div className="contact-link">
                           <Mail size={16} /> <span>{dir.email}</span>
-                        </a>
+                        </div>
                       )}
                       {dir.phone && (
-                        <a href={`tel:${dir.phone}`} className="contact-link">
+                        <div className="contact-link">
                           <Phone size={16} /> <span>{dir.phone}</span>
-                        </a>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -253,6 +256,7 @@ export const About: React.FC = () => {
                   key={idx}
                   className="leader-card glass-card spotlight-card animate-slide-up"
                   style={{ animationDelay: `${(idx + directors.length) * 150}ms` }}
+                  onClick={() => setSelectedLeader(sec)}
                 >
                   <div className="leader-photo-container">
                     {sec.photoUrl ? (
@@ -268,14 +272,14 @@ export const About: React.FC = () => {
                     <p className="leader-bio">{sec.bio}</p>
                     <div className="leader-contact-info">
                       {sec.email && (
-                        <a href={`mailto:${sec.email}`} className="contact-link">
+                        <div className="contact-link">
                           <Mail size={16} /> <span>{sec.email}</span>
-                        </a>
+                        </div>
                       )}
                       {sec.phone && (
-                        <a href={`tel:${sec.phone}`} className="contact-link">
+                        <div className="contact-link">
                           <Phone size={16} /> <span>{sec.phone}</span>
-                        </a>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -332,6 +336,65 @@ export const About: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Lightbox details modal */}
+      {selectedLeader && (
+        <div className="lightbox-overlay" onClick={() => setSelectedLeader(null)}>
+          <div className="lightbox-modal glass-card animate-scale-up" onClick={(e) => e.stopPropagation()}>
+            <button className="lightbox-close-btn" onClick={() => setSelectedLeader(null)}>
+              <X size={24} />
+            </button>
+            
+            <div className="lightbox-content-grid">
+              <div className="lightbox-image-column">
+                {selectedLeader.photoUrl ? (
+                  <img src={selectedLeader.photoUrl} alt={selectedLeader.name} className="lightbox-big-img" />
+                ) : (
+                  <div className="lightbox-placeholder">
+                    <User size={80} />
+                  </div>
+                )}
+              </div>
+              
+              <div className="lightbox-info-column">
+                <span className={`lightbox-tag badge-category-${selectedLeader.category}`}>
+                  {selectedLeader.category === 'director' ? 'Managing Director' : 'Executive Secretary'}
+                </span>
+                <h2 className="lightbox-name">{selectedLeader.name}</h2>
+                <h4 className="lightbox-role">{selectedLeader.role}</h4>
+                
+                {selectedLeader.bio && (
+                  <div className="lightbox-bio-section">
+                    <h5>Biography</h5>
+                    <p className="lightbox-bio-text">{selectedLeader.bio}</p>
+                  </div>
+                )}
+                
+                <div className="lightbox-contact-section">
+                  <h5>Contact Details</h5>
+                  <div className="lightbox-contact-links">
+                    {selectedLeader.email ? (
+                      <a href={`mailto:${selectedLeader.email}`} className="lightbox-link">
+                        <Mail size={16} /> <span>{selectedLeader.email}</span>
+                      </a>
+                    ) : (
+                      <span className="no-contact-text">No email provided</span>
+                    )}
+                    
+                    {selectedLeader.phone ? (
+                      <a href={`tel:${selectedLeader.phone}`} className="lightbox-link">
+                        <Phone size={16} /> <span>{selectedLeader.phone}</span>
+                      </a>
+                    ) : (
+                      <span className="no-contact-text">No phone number provided</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .about-page {
@@ -493,6 +556,14 @@ export const About: React.FC = () => {
           padding: 24px;
           border-top: 4px solid var(--secondary);
           text-align: left;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .leader-card:hover {
+          transform: translateY(-6px);
+          border-color: var(--secondary-dark);
+          box-shadow: var(--shadow-md);
         }
 
         .leader-photo-container {
@@ -559,6 +630,7 @@ export const About: React.FC = () => {
         .leader-name {
           font-size: 1.5rem;
           margin-bottom: 4px;
+          color: var(--primary-dark);
         }
 
         .leader-role-text {
@@ -588,12 +660,183 @@ export const About: React.FC = () => {
           gap: 8px;
           font-size: 0.9rem;
           color: var(--text-secondary);
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .contact-link:hover {
+        /* Lightbox popup styling */
+        .lightbox-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background-color: rgba(12, 35, 64, 0.65);
+          backdrop-filter: blur(8px);
+          z-index: 2000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+        }
+
+        .lightbox-modal {
+          width: 100%;
+          max-width: 800px;
+          background-color: white;
+          border-radius: var(--radius-sm);
+          padding: 32px;
+          position: relative;
+          box-shadow: var(--shadow-lg);
+          border: 1px solid var(--border-color);
+        }
+
+        .lightbox-close-btn {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: var(--text-secondary);
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          z-index: 10;
+        }
+
+        .lightbox-close-btn:hover {
+          background-color: var(--bg-secondary);
+          color: var(--primary);
+        }
+
+        .lightbox-content-grid {
+          display: grid;
+          grid-template-columns: 1fr 1.3fr;
+          gap: 32px;
+          align-items: start;
+        }
+
+        @media (max-width: 640px) {
+          .lightbox-content-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+          }
+          .lightbox-modal {
+            padding: 24px 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+          }
+        }
+
+        .lightbox-image-column {
+          width: 100%;
+          height: 320px;
+          border-radius: var(--radius-sm);
+          overflow: hidden;
+          background-color: var(--bg-tertiary);
+          box-shadow: var(--shadow-sm);
+        }
+
+        @media (max-width: 640px) {
+          .lightbox-image-column {
+            height: 240px;
+          }
+        }
+
+        .lightbox-big-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .lightbox-placeholder {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--text-light);
+        }
+
+        .lightbox-info-column {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          text-align: left;
+        }
+
+        .lightbox-tag {
+          font-family: var(--font-heading);
+          font-size: 0.7rem;
+          font-weight: 700;
+          padding: 4px 12px;
+          border-radius: 4px;
+          color: white;
+          margin-bottom: 12px;
+        }
+
+        .lightbox-name {
+          font-size: 1.8rem;
+          color: var(--primary-dark);
+          margin-bottom: 4px;
+        }
+
+        .lightbox-role {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--secondary);
+          margin-bottom: 24px;
+        }
+
+        .lightbox-bio-section, .lightbox-contact-section {
+          width: 100%;
+          margin-bottom: 20px;
+        }
+
+        .lightbox-bio-section h5, .lightbox-contact-section h5 {
+          font-family: var(--font-heading);
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          color: var(--text-light);
+          letter-spacing: 1px;
+          margin-bottom: 8px;
+          border-bottom: 1px solid var(--border-color);
+          padding-bottom: 4px;
+        }
+
+        .lightbox-bio-text {
+          font-size: 0.95rem;
+          color: var(--text-secondary);
+          line-height: 1.6;
+        }
+
+        .lightbox-contact-links {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .lightbox-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.9rem;
+          color: var(--text-secondary);
+          transition: all 0.2s ease;
+        }
+
+        .lightbox-link:hover {
           color: var(--secondary);
           transform: translateX(4px);
+        }
+
+        .no-contact-text {
+          font-size: 0.85rem;
+          color: var(--text-light);
+          font-style: italic;
         }
 
         /* Why choose grid */

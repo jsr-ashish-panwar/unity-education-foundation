@@ -241,6 +241,24 @@ export const Contact: React.FC = () => {
         </div>
       </section>
 
+      {/* Interactive Google Map Section */}
+      <section className="section contact-map-section">
+        <div className="container">
+          <div className="map-wrapper glass-card animate-slide-up">
+            <iframe
+              title="Office Location Map"
+              src="https://maps.google.com/maps?q=28.8340597,77.5698925&z=17&output=embed"
+              width="100%"
+              height="450"
+              style={{ border: 0 }}
+              allowFullScreen={true}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+
       <style>{`
         .contact-page {
           padding-top: 80px;
@@ -410,9 +428,44 @@ export const Contact: React.FC = () => {
           margin-top: 10px;
         }
 
+        /* Map Section Styles */
+        .contact-map-section {
+          padding-top: 0;
+          margin-bottom: 60px;
+        }
+
+        .map-wrapper {
+          padding: 8px;
+          border-radius: var(--radius-sm);
+          overflow: hidden;
+          box-shadow: var(--shadow-md);
+          border: 1px solid var(--border-color);
+          background-color: white;
+          line-height: 0;
+        }
+
+        .map-wrapper iframe {
+          border-radius: var(--radius-sm);
+          filter: grayscale(8%) contrast(102%) saturate(98%);
+          transition: filter 0.3s ease;
+        }
+
+        .map-wrapper iframe:hover {
+          filter: none;
+        }
+
         @media (max-width: 992px) {
           .contact-grid {
             grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .map-wrapper iframe {
+            height: 320px;
+          }
+          .contact-map-section {
+            margin-bottom: 40px;
           }
         }
 
@@ -470,6 +523,9 @@ export const Contact: React.FC = () => {
           .form-group input, .form-group textarea {
             padding: 10px 12px;
             font-size: 0.9rem;
+          }
+          .map-wrapper iframe {
+            height: 240px;
           }
         }
 
