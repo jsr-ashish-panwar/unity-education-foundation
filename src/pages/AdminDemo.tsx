@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { API_URL } from '../config';
+import { API_URL, ADMIN_PASSWORD } from '../config';
 import { 
   Database, 
   AlertCircle, 
@@ -247,7 +247,7 @@ export const AdminDemo: React.FC = () => {
   // Handle password login
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === 'unityedu123') {
+    if (passwordInput === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
       sessionStorage.setItem('unity_admin_authenticated', 'true');
       setLoginError('');
