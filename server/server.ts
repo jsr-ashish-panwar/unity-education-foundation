@@ -36,7 +36,7 @@ const defaultEmployees = [
     category: "secretary",
     photoUrl: "/mrs.chandni chauhan.jpeg",
     email: "chandnichauhan443@gmail.com",
-    phone: "+91 8979288628",
+    phone: "0121-4108015",
     bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance.",
     order: 2
   }
@@ -82,7 +82,7 @@ const initDB = async () => {
         sunita.name = "Mrs. Chandni Chauhan";
         sunita.photoUrl = "/mrs.chandni chauhan.jpeg";
         sunita.email = "chandnichauhan443@gmail.com";
-        sunita.phone = "+91 8979288628";
+        sunita.phone = "0121-4108015";
         await sunita.save();
       }
 

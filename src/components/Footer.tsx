@@ -38,13 +38,7 @@ export const Footer: React.FC = () => {
               <Link to="/about"><ArrowRight size={14} /> About Us</Link>
             </li>
             <li>
-              <Link to="/team"><ArrowRight size={14} /> Our Team</Link>
-            </li>
-            <li>
               <Link to="/services"><ArrowRight size={14} /> Services</Link>
-            </li>
-            <li>
-              <Link to="/gallery"><ArrowRight size={14} /> Gallery</Link>
             </li>
             <li>
               <Link to="/contact"><ArrowRight size={14} /> Contact Us</Link>
@@ -59,13 +53,34 @@ export const Footer: React.FC = () => {
         <div className="footer-col contact-col">
           <h3 className="footer-title">Get In Touch</h3>
           <ul className="footer-contacts">
-            <li>
+            <li className="footer-address-item">
               <MapPin size={20} className="contact-icon" />
-              <span>H. No-69 KASBA SIWAL KHAS, MEERUT 250501 (UP)</span>
+              <div>
+                <strong style={{ display: 'block', color: 'var(--text-white)', fontSize: '0.85rem', marginBottom: '2px' }}>Permanent Address:</strong>
+                <a href="https://maps.app.goo.gl/RnJsguT1THZA9aP48?g_st=ac" target="_blank" rel="noopener noreferrer">
+                  H. No-69 KASBA SIWAL KHAS, MEERUT 250501 (UP)
+                </a>
+              </div>
+            </li>
+            <li className="footer-address-item">
+              <MapPin size={20} className="contact-icon" />
+              <div>
+                <strong style={{ display: 'block', color: 'var(--text-white)', fontSize: '0.85rem', marginBottom: '2px' }}>Alternative Address:</strong>
+                <a href="https://maps.app.goo.gl/hPm7mdXNGLzoKN2JA?g_st=ac" target="_blank" rel="noopener noreferrer">
+                  C-84-85 SHRADHAPURI-II, KANKAR KHERA, MEERUT 250001 (UP)
+                </a>
+              </div>
             </li>
             <li>
               <Phone size={20} className="contact-icon" />
-              <a href="tel:+919557558628">+91 9557558628</a>
+              <div>
+                <span style={{ display: 'block', fontSize: '0.9rem', marginBottom: '2px' }}>
+                  Director: <a href="tel:+919557558628" style={{ display: 'inline', color: 'rgba(255, 255, 255, 0.7)' }}>+91 9557558628</a>
+                </span>
+                <span style={{ display: 'block', fontSize: '0.9rem' }}>
+                  Secretary: <a href="tel:01214108015" style={{ display: 'inline', color: 'rgba(255, 255, 255, 0.7)' }}>0121-4108015</a>
+                </span>
+              </div>
             </li>
             <li>
               <Mail size={20} className="contact-icon" />

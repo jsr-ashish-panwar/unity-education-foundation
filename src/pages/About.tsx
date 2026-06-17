@@ -61,7 +61,7 @@ export const About: React.FC = () => {
             category: "secretary",
             photoUrl: "/mrs.chandni chauhan.jpeg",
             email: "chandnichauhan443@gmail.com",
-            phone: "+91 8979288628",
+            phone: "0121-4108015",
             bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance."
           }
         ]);

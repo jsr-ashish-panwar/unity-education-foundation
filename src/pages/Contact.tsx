@@ -16,6 +16,7 @@ export const Contact: React.FC = () => {
     type: 'success' | 'error' | null;
     message: string;
   }>({ type: null, message: '' });
+  const [activeMap, setActiveMap] = useState<'permanent' | 'alternative'>('permanent');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -116,16 +117,33 @@ export const Contact: React.FC = () => {
               <div className="info-item-box">
                 <MapPin size={24} className="info-icon" />
                 <div className="info-item-text">
-                  <h4>Office Address</h4>
+                  <h4>Permanent Location</h4>
                   <p>H. No-69 KASBA SIWAL KHAS, MEERUT 250501 (UP)</p>
+                  <a href="https://maps.app.goo.gl/RnJsguT1THZA9aP48?g_st=ac" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--secondary)', display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 'bold' }}>
+                    View on Google Maps &rarr;
+                  </a>
+                </div>
+              </div>
+
+              <div className="info-item-box">
+                <MapPin size={24} className="info-icon" />
+                <div className="info-item-text">
+                  <h4>Alternative Location</h4>
+                  <p>C-84-85 SHRADHAPURI-II, KANKAR KHERA, MEERUT 250001 (UP)</p>
+                  <a href="https://maps.app.goo.gl/hPm7mdXNGLzoKN2JA?g_st=ac" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--secondary)', display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 'bold' }}>
+                    View on Google Maps &rarr;
+                  </a>
                 </div>
               </div>
 
               <div className="info-item-box">
                 <Phone size={24} className="info-icon" />
                 <div className="info-item-text">
-                  <h4>Phone Number</h4>
-                  <a href="tel:+919557558628">+91 9557558628</a>
+                  <h4>Phone Numbers</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.95rem' }}>
+                    <span>Director: <a href="tel:+919557558628" style={{ fontWeight: 'bold', color: 'var(--primary)' }}>+91 9557558628</a></span>
+                    <span>Secretary: <a href="tel:01214108015" style={{ fontWeight: 'bold', color: 'var(--primary)' }}>0121-4108015</a></span>
+                  </div>
                 </div>
               </div>
 
@@ -245,17 +263,46 @@ export const Contact: React.FC = () => {
       {/* Interactive Google Map Section */}
       <section className="section contact-map-section">
         <div className="container">
+          <div className="map-tabs" style={{ display: 'flex', gap: '12px', marginBottom: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setActiveMap('permanent')}
+              className={`btn ${activeMap === 'permanent' ? 'btn-primary' : 'btn-outline'}`}
+              style={{ minWidth: '200px' }}
+            >
+              Permanent Location
+            </button>
+            <button
+              onClick={() => setActiveMap('alternative')}
+              className={`btn ${activeMap === 'alternative' ? 'btn-primary' : 'btn-outline'}`}
+              style={{ minWidth: '200px' }}
+            >
+              Alternative Location
+            </button>
+          </div>
           <div className="map-wrapper glass-card animate-slide-up">
-            <iframe
-              title="Office Location Map"
-              src="https://maps.google.com/maps?q=28.8340597,77.5698925&z=17&output=embed"
-              width="100%"
-              height="450"
-              style={{ border: 0 }}
-              allowFullScreen={true}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
+            {activeMap === 'permanent' ? (
+              <iframe
+                title="Permanent Office Location Map"
+                src="https://maps.google.com/maps?q=H.%20No-69%20KASBA%20SIWAL%20KHAS,%20MEERUT%20250501%20(UP)&z=15&output=embed"
+                width="100%"
+                height="450"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            ) : (
+              <iframe
+                title="Alternative Office Location Map"
+                src="https://maps.google.com/maps?q=C-84-85%20SHRADHAPURI-II,%20KANKAR%20KHERA,%20MEERUT%20250001%20(UP)&z=15&output=embed"
+                width="100%"
+                height="450"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            )}
           </div>
         </div>
       </section>

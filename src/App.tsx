@@ -5,10 +5,8 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
-import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
 import AdminDemo from './pages/AdminDemo';
-import Team from './pages/Team';
 
 // Helper component to scroll to top on route change
 const ScrollToTop: React.FC = () => {
@@ -32,9 +30,7 @@ export const App: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<Services />} />
-            <Route path="/gallery" element={<Gallery />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/team" element={<Team />} />
             <Route path="/admin" element={<AdminDemo />} />
             {/* Fallback route */}
             <Route path="*" element={<Home />} />
