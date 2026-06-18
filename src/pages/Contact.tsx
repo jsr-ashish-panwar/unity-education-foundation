@@ -55,12 +55,12 @@ export const Contact: React.FC = () => {
         });
         
         // Prepare WhatsApp message
-        const whatsappMsg = `*New Contact Inquiry - Unity Education Foundation*\n\n` +
-          `*Name:* ${formData.name}\n` +
-          `*Email:* ${formData.email}\n` +
-          `*Phone:* ${formData.contact || 'N/A'}\n` +
-          `*Subject:* ${formData.subject}\n\n` +
-          `*Message:*\n${formData.message}`;
+        const whatsappMsg = `New Contact Inquiry - Unity Education Foundation\n\n` +
+          `Name: ${formData.name}\n` +
+          `Email: ${formData.email}\n` +
+          `Phone: ${formData.contact || 'N/A'}\n` +
+          `Subject: ${formData.subject}\n\n` +
+          `Message:\n${formData.message}`;
 
         // Redirect to WhatsApp
         const whatsappUrl = `https://wa.me/919557558628?text=${encodeURIComponent(whatsappMsg)}`;
@@ -93,12 +93,12 @@ export const Contact: React.FC = () => {
         });
 
         // Prepare WhatsApp message (offline flow)
-        const whatsappMsg = `*New Contact Inquiry (Offline Flow) - Unity Education Foundation*\n\n` +
-          `*Name:* ${formData.name}\n` +
-          `*Email:* ${formData.email}\n` +
-          `*Phone:* ${formData.contact || 'N/A'}\n` +
-          `*Subject:* ${formData.subject}\n\n` +
-          `*Message:*\n${formData.message}`;
+        const whatsappMsg = `New Contact Inquiry (Offline Flow) - Unity Education Foundation\n\n` +
+          `Name: ${formData.name}\n` +
+          `Email: ${formData.email}\n` +
+          `Phone: ${formData.contact || 'N/A'}\n` +
+          `Subject: ${formData.subject}\n\n` +
+          `Message:\n${formData.message}`;
 
         // Redirect to WhatsApp
         const whatsappUrl = `https://wa.me/919557558628?text=${encodeURIComponent(whatsappMsg)}`;
