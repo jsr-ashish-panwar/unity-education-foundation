@@ -21,11 +21,11 @@ const mockContacts: any[] = [];
 // Default employee list
 const defaultEmployees = [
   {
-    name: "Dr. Alok Sharma",
+    name: "Mr. Amjad Chauhan",
     role: "Managing Director",
     category: "director",
     photoUrl: "",
-    email: "alok.sharma@unityeducation.org",
+    email: "",
     phone: "+91 9557558628",
     bio: "Over 15 years of leadership in educational administration and community operational development.",
     order: 1
@@ -35,7 +35,7 @@ const defaultEmployees = [
     role: "Executive Secretary",
     category: "secretary",
     photoUrl: "",
-    email: "chandnichauhan443@gmail.com",
+    email: "",
     phone: "0121-4108015",
     bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance.",
     order: 2
@@ -81,17 +81,21 @@ const initDB = async () => {
         console.log('Migration: Updating Mrs. Sunita Siwach to Mrs. Chandni Chauhan in MongoDB.');
         sunita.name = "Mrs. Chandni Chauhan";
         sunita.photoUrl = "";
-        sunita.email = "chandnichauhan443@gmail.com";
+        sunita.email = "";
         sunita.phone = "0121-4108015";
         await sunita.save();
       }
 
-      // Update all directors & secretaries to have empty photoUrl
-      const leadershipUpdate = await Employee.updateMany(
-        { category: { $in: ['director', 'secretary'] } },
-        { $set: { photoUrl: "" } }
+      // Update existing seeded leadership to have correct names, emails, phones, and clear photos
+      const dirUpdate = await Employee.updateMany(
+        { category: 'director' },
+        { $set: { name: "Mr. Amjad Chauhan", email: "", photoUrl: "", phone: "+91 9557558628" } }
       );
-      console.log(`Migration: Cleared photos for existing leadership. Matched ${leadershipUpdate.matchedCount}, modified ${leadershipUpdate.modifiedCount}`);
+      const secUpdate = await Employee.updateMany(
+        { category: 'secretary' },
+        { $set: { name: "Mrs. Chandni Chauhan", email: "", photoUrl: "", phone: "0121-4108015" } }
+      );
+      console.log(`Migration: Updated leadership names, phone numbers, and cleared photos/emails. Director matched ${dirUpdate.matchedCount}, modified ${dirUpdate.modifiedCount}; Secretary matched ${secUpdate.matchedCount}, modified ${secUpdate.modifiedCount}`);
 
       // Seeding Gallery Items
       const galleryCount = await GalleryItem.countDocuments();

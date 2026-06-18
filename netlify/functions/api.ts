@@ -14,11 +14,11 @@ app.use(express.json());
 // Default data lists
 const defaultEmployees = [
   {
-    name: "Dr. Alok Sharma",
+    name: "Mr. Amjad Chauhan",
     role: "Managing Director",
     category: "director",
     photoUrl: "",
-    email: "alok.sharma@unityeducation.org",
+    email: "",
     phone: "+91 9557558628",
     bio: "Over 15 years of leadership in educational administration and community operational development.",
     order: 1
@@ -28,7 +28,7 @@ const defaultEmployees = [
     role: "Executive Secretary",
     category: "secretary",
     photoUrl: "",
-    email: "chandnichauhan443@gmail.com",
+    email: "",
     phone: "0121-4108015",
     bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance.",
     order: 2
@@ -83,10 +83,14 @@ const seedIfEmpty = async () => {
       console.log("Seeded default gallery items in MongoDB.");
     }
 
-    // Migration: Update existing seeded leadership to have no photoUrl
+    // Migration: Update existing seeded leadership to have correct names, emails, phones, and clear photos
     await Employee.updateMany(
-      { category: { $in: ['director', 'secretary'] } },
-      { $set: { photoUrl: "" } }
+      { category: 'director' },
+      { $set: { name: "Mr. Amjad Chauhan", email: "", photoUrl: "", phone: "+91 9557558628" } }
+    );
+    await Employee.updateMany(
+      { category: 'secretary' },
+      { $set: { name: "Mrs. Chandni Chauhan", email: "", photoUrl: "", phone: "0121-4108015" } }
     );
   } catch (err) {
     console.error("Failed to seed MongoDB:", err);

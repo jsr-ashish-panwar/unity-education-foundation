@@ -47,11 +47,11 @@ export const About: React.FC = () => {
         console.log("Offline fallback. Using fallback leadership info.");
         setEmployees([
           {
-            name: "Dr. Alok Sharma",
+            name: "Mr. Amjad Chauhan",
             role: "Managing Director",
             category: "director",
             photoUrl: "",
-            email: "alok.sharma@unityeducation.org",
+            email: "",
             phone: "+91 9557558628",
             bio: "Over 15 years of leadership in educational administration and community operational development."
           },
@@ -60,7 +60,7 @@ export const About: React.FC = () => {
             role: "Secretary",
             category: "secretary",
             photoUrl: "",
-            email: "chandnichauhan443@gmail.com",
+            email: "",
             phone: "0121-4108015",
             bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance."
           }
