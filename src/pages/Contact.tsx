@@ -51,8 +51,23 @@ export const Contact: React.FC = () => {
       if (response.ok && data.success) {
         setStatus({
           type: 'success',
-          message: 'Thank you! Your message has been sent to our administration team.'
+          message: 'Thank you! Your inquiry has been saved. Redirecting to WhatsApp to send your message...'
         });
+        
+        // Prepare WhatsApp message
+        const whatsappMsg = `*New Contact Inquiry - Unity Education Foundation*\n\n` +
+          `*Name:* ${formData.name}\n` +
+          `*Email:* ${formData.email}\n` +
+          `*Phone:* ${formData.contact || 'N/A'}\n` +
+          `*Subject:* ${formData.subject}\n\n` +
+          `*Message:*\n${formData.message}`;
+
+        // Redirect to WhatsApp
+        const whatsappUrl = `https://wa.me/919557558628?text=${encodeURIComponent(whatsappMsg)}`;
+        setTimeout(() => {
+          window.open(whatsappUrl, '_blank');
+        }, 1200);
+
         setFormData({ name: '', email: '', contact: '', subject: '', message: '' });
       } else {
         throw new Error(data.error || 'Failed to submit form');
@@ -74,8 +89,23 @@ export const Contact: React.FC = () => {
 
         setStatus({
           type: 'success',
-          message: 'Inquiry registered locally (Offline Mode). We will process your message as soon as connection is restored.'
+          message: 'Inquiry saved locally (Offline Mode). Redirecting to WhatsApp to send your message...'
         });
+
+        // Prepare WhatsApp message (offline flow)
+        const whatsappMsg = `*New Contact Inquiry (Offline Flow) - Unity Education Foundation*\n\n` +
+          `*Name:* ${formData.name}\n` +
+          `*Email:* ${formData.email}\n` +
+          `*Phone:* ${formData.contact || 'N/A'}\n` +
+          `*Subject:* ${formData.subject}\n\n` +
+          `*Message:*\n${formData.message}`;
+
+        // Redirect to WhatsApp
+        const whatsappUrl = `https://wa.me/919557558628?text=${encodeURIComponent(whatsappMsg)}`;
+        setTimeout(() => {
+          window.open(whatsappUrl, '_blank');
+        }, 1200);
+
         setFormData({ name: '', email: '', contact: '', subject: '', message: '' });
       } catch (err) {
         setStatus({
