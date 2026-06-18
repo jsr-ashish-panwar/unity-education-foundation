@@ -24,7 +24,7 @@ const defaultEmployees = [
     name: "Dr. Alok Sharma",
     role: "Managing Director",
     category: "director",
-    photoUrl: "/assets/director.webp",
+    photoUrl: "",
     email: "alok.sharma@unityeducation.org",
     phone: "+91 9557558628",
     bio: "Over 15 years of leadership in educational administration and community operational development.",
@@ -34,7 +34,7 @@ const defaultEmployees = [
     name: "Mrs. Chandni Chauhan",
     role: "Executive Secretary",
     category: "secretary",
-    photoUrl: "/mrs.chandni chauhan.jpeg",
+    photoUrl: "",
     email: "chandnichauhan443@gmail.com",
     phone: "0121-4108015",
     bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance.",
@@ -80,11 +80,18 @@ const initDB = async () => {
       if (sunita) {
         console.log('Migration: Updating Mrs. Sunita Siwach to Mrs. Chandni Chauhan in MongoDB.');
         sunita.name = "Mrs. Chandni Chauhan";
-        sunita.photoUrl = "/mrs.chandni chauhan.jpeg";
+        sunita.photoUrl = "";
         sunita.email = "chandnichauhan443@gmail.com";
         sunita.phone = "0121-4108015";
         await sunita.save();
       }
+
+      // Update all directors & secretaries to have empty photoUrl
+      const leadershipUpdate = await Employee.updateMany(
+        { category: { $in: ['director', 'secretary'] } },
+        { $set: { photoUrl: "" } }
+      );
+      console.log(`Migration: Cleared photos for existing leadership. Matched ${leadershipUpdate.matchedCount}, modified ${leadershipUpdate.modifiedCount}`);
 
       // Seeding Gallery Items
       const galleryCount = await GalleryItem.countDocuments();

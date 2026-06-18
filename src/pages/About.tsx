@@ -50,7 +50,7 @@ export const About: React.FC = () => {
             name: "Dr. Alok Sharma",
             role: "Managing Director",
             category: "director",
-            photoUrl: "/assets/director.webp",
+            photoUrl: "",
             email: "alok.sharma@unityeducation.org",
             phone: "+91 9557558628",
             bio: "Over 15 years of leadership in educational administration and community operational development."
@@ -59,7 +59,7 @@ export const About: React.FC = () => {
             name: "Mrs. Chandni Chauhan",
             role: "Secretary",
             category: "secretary",
-            photoUrl: "/mrs.chandni chauhan.jpeg",
+            photoUrl: "",
             email: "chandnichauhan443@gmail.com",
             phone: "0121-4108015",
             bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance."
