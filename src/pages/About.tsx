@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../config';
+import logo from '../assets/logo.png';
 import {
   Target,
   Eye,
@@ -12,7 +13,6 @@ import {
   Clock,
   Mail,
   Phone,
-  User,
   Loader2,
   X
 } from 'lucide-react';
@@ -227,7 +227,7 @@ export const About: React.FC = () => {
                     {dir.photoUrl ? (
                       <img src={dir.photoUrl} alt={dir.name} className="leader-photo" />
                     ) : (
-                      <div className="photo-placeholder"><User size={60} /></div>
+                      <img src={logo} alt={dir.name} className="leader-photo" style={{ objectFit: 'contain', padding: '16px', backgroundColor: '#ffffff' }} />
                     )}
                     <span className="badge-role badge-director">Managing Director</span>
                   </div>
@@ -263,7 +263,7 @@ export const About: React.FC = () => {
                     {sec.photoUrl ? (
                       <img src={sec.photoUrl} alt={sec.name} className="leader-photo" />
                     ) : (
-                      <div className="photo-placeholder"><User size={60} /></div>
+                      <img src={logo} alt={sec.name} className="leader-photo" style={{ objectFit: 'contain', padding: '16px', backgroundColor: '#ffffff' }} />
                     )}
                     <span className="badge-role badge-secretary">Executive Secretary</span>
                   </div>
@@ -351,9 +351,7 @@ export const About: React.FC = () => {
                 {selectedLeader.photoUrl ? (
                   <img src={selectedLeader.photoUrl} alt={selectedLeader.name} className="lightbox-big-img" />
                 ) : (
-                  <div className="lightbox-placeholder">
-                    <User size={80} />
-                  </div>
+                  <img src={logo} alt={selectedLeader.name} className="lightbox-big-img" style={{ objectFit: 'contain', padding: '24px', backgroundColor: '#ffffff' }} />
                 )}
               </div>
 

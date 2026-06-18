@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL, ADMIN_PASSWORD } from '../config';
+import logo from '../assets/logo.png';
 import { 
   Database, 
   AlertCircle, 
@@ -791,6 +792,8 @@ export const AdminDemo: React.FC = () => {
                       <div key={emp._id} className="admin-emp-card">
                         {emp.photoUrl ? (
                           <img src={emp.photoUrl} alt={emp.name} className="admin-emp-photo" />
+                        ) : emp.category === 'director' || emp.category === 'secretary' ? (
+                          <img src={logo} alt={emp.name} className="admin-emp-photo" style={{ objectFit: 'contain', padding: '4px', backgroundColor: '#ffffff' }} />
                         ) : (
                           <div className="admin-emp-placeholder">
                             <User size={30} />
