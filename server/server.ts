@@ -25,9 +25,9 @@ const defaultEmployees = [
     role: "Managing Director",
     category: "director",
     photoUrl: "",
-    email: "",
+    email: "amjadchauhan2018@gmail.com",
     phone: "+91 9557558628",
-    bio: "Over 15 years of leadership in educational administration and community operational development.",
+    bio: "Over 9 years of leadership in educational administration and community operational development.",
     order: 1
   },
   {
@@ -35,7 +35,7 @@ const defaultEmployees = [
     role: "Executive Secretary",
     category: "secretary",
     photoUrl: "",
-    email: "",
+    email: "chandnichauhan443@gmail.com",
     phone: "0121-4108015",
     bio: "Dedicated to streamlining cross-functional workflows and maintaining robust administrative compliance.",
     order: 2
@@ -89,11 +89,11 @@ const initDB = async () => {
       // Update existing seeded leadership to have correct names, emails, phones, and clear photos
       const dirUpdate = await Employee.updateMany(
         { category: 'director' },
-        { $set: { name: "Mr. Amjad Chauhan", email: "", photoUrl: "", phone: "+91 9557558628" } }
+        { $set: { name: "Mr. Amjad Chauhan", email: "amjadchauhan2018@gmail.com", photoUrl: "", phone: "+91 9557558628", bio: "Over 9 years of leadership in educational administration and community operational development." } }
       );
       const secUpdate = await Employee.updateMany(
         { category: 'secretary' },
-        { $set: { name: "Mrs. Chandni Chauhan", email: "", photoUrl: "", phone: "0121-4108015" } }
+        { $set: { name: "Mrs. Chandni Chauhan", email: "chandnichauhan443@gmail.com", photoUrl: "", phone: "0121-4108015" } }
       );
       console.log(`Migration: Updated leadership names, phone numbers, and cleared photos/emails. Director matched ${dirUpdate.matchedCount}, modified ${dirUpdate.modifiedCount}; Secretary matched ${secUpdate.matchedCount}, modified ${secUpdate.modifiedCount}`);
 
