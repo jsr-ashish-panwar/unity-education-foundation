@@ -249,37 +249,63 @@ export const AdminDemo: React.FC = () => {
   const loadGalleryItems = async () => {
     setGalleryLoading(true);
     setGalleryError('');
+    
+    let localItems: GalleryItem[] = [];
+    try {
+      const stored = localStorage.getItem('unity_local_gallery');
+      if (stored) {
+        localItems = JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error('Failed to read local gallery storage', e);
+    }
+
+    let apiItems: GalleryItem[] = [];
     try {
       const res = await fetch(`${API_URL}/api/gallery`);
       if (res.ok) {
         const json = await res.json();
-        if (json.success) {
-          setGalleryItems(json.data);
-        } else {
-          setGalleryError(json.error || 'Failed to retrieve gallery items');
+        if (json.success && Array.isArray(json.data)) {
+          apiItems = json.data;
         }
-      } else {
-        setGalleryError(`Backend returned status ${res.status}`);
       }
     } catch (err) {
-      setGalleryError('Server offline. Using local gallery memory.');
-      setGalleryItems([
-        {
-          _id: 'mock_gal_1',
-          title: "Educational Support Distribution",
-          description: "Providing learning materials and kits to children at community centers.",
-          imageUrl: "/wall1.jpg"
-        },
-        {
-          _id: 'mock_gal_2',
-          title: "Community Outreach",
-          description: "Helping build robust community operations and supportive networks.",
-          imageUrl: "/mrs.chandni chauhan.jpeg"
-        }
-      ]);
-    } finally {
-      setGalleryLoading(false);
+      console.log('Server offline. Reading local storage for gallery.');
     }
+
+    const defaultItems: GalleryItem[] = [
+      {
+        _id: 'mock_gal_1',
+        title: "Educational Support Distribution",
+        description: "Providing learning materials and kits to children at community centers.",
+        imageUrl: "/wall1.jpg"
+      },
+      {
+        _id: 'mock_gal_2',
+        title: "Community Outreach",
+        description: "Helping build robust community operations and supportive networks.",
+        imageUrl: "/mrs.chandni chauhan.jpeg"
+      }
+    ];
+
+    // Combine local items + api items
+    const combinedMap = new Map<string, GalleryItem>();
+    
+    [...localItems, ...apiItems].forEach(item => {
+      const key = item._id || item.imageUrl;
+      if (key && !combinedMap.has(key)) {
+        combinedMap.set(key, item);
+      }
+    });
+
+    // If still empty, add default items
+    if (combinedMap.size === 0) {
+      defaultItems.forEach(item => combinedMap.set(item._id!, item));
+    }
+
+    const result = Array.from(combinedMap.values());
+    setGalleryItems(result);
+    setGalleryLoading(false);
   };
 
   // Trigger loading when authenticated
@@ -444,6 +470,25 @@ export const AdminDemo: React.FC = () => {
     setIsAddingGal(true);
     setGalMessage({ type: '', text: '' });
 
+    const newGalItem: GalleryItem = {
+      _id: 'gal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      title: galTitle.trim() || 'Activity Showcase',
+      description: galDescription.trim(),
+      imageUrl: galImageUrl,
+      createdAt: new Date().toISOString()
+    };
+
+    // Always update localStorage first to ensure instant persistence
+    try {
+      const existingStr = localStorage.getItem('unity_local_gallery');
+      const existingList: GalleryItem[] = existingStr ? JSON.parse(existingStr) : [];
+      existingList.unshift(newGalItem);
+      localStorage.setItem('unity_local_gallery', JSON.stringify(existingList));
+      window.dispatchEvent(new Event('unity_gallery_updated'));
+    } catch (err) {
+      console.error('Failed to save gallery item to localStorage', err);
+    }
+
     try {
       const res = await fetch(`${API_URL}/api/gallery`, {
         method: 'POST',
@@ -458,27 +503,17 @@ export const AdminDemo: React.FC = () => {
       const json = await res.json();
       if (res.ok && json.success) {
         setGalMessage({ type: 'success', text: 'Gallery photo added successfully!' });
-        setGalTitle('');
-        setGalDescription('');
-        setGalImageUrl('');
-        setGalFileName('');
-        await loadGalleryItems();
       } else {
-        setGalMessage({ type: 'error', text: json.error || 'Failed to save gallery item.' });
+        setGalMessage({ type: 'success', text: 'Photo saved locally! (Backend message: ' + (json.error || 'Saved locally') + ')' });
       }
     } catch (err) {
-      const newMockGal: GalleryItem = {
-        _id: 'mock_gal_' + Math.random().toString(36).substr(2, 9),
-        title: galTitle,
-        description: galDescription,
-        imageUrl: galImageUrl
-      };
-      setGalleryItems(prev => [newMockGal, ...prev]);
-      setGalMessage({ type: 'success', text: 'Backend offline: Added photo to frontend memory.' });
+      setGalMessage({ type: 'success', text: 'Photo added and saved to local gallery storage!' });
+    } finally {
       setGalTitle('');
       setGalDescription('');
       setGalImageUrl('');
-    } finally {
+      setGalFileName('');
+      await loadGalleryItems();
       setIsAddingGal(false);
     }
   };
@@ -490,20 +525,28 @@ export const AdminDemo: React.FC = () => {
       return;
     }
 
+    // Remove from localStorage
     try {
-      const res = await fetch(`${API_URL}/api/gallery/${id}`, {
-        method: 'DELETE'
-      });
-      const json = await res.json();
-      if (res.ok && json.success) {
-        await loadGalleryItems();
-      } else {
-        alert(json.error || 'Failed to delete gallery photo.');
+      const existingStr = localStorage.getItem('unity_local_gallery');
+      if (existingStr) {
+        const existingList: GalleryItem[] = JSON.parse(existingStr);
+        const filtered = existingList.filter(item => item._id !== id && item.imageUrl !== id);
+        localStorage.setItem('unity_local_gallery', JSON.stringify(filtered));
+        window.dispatchEvent(new Event('unity_gallery_updated'));
       }
     } catch (err) {
-      setGalleryItems(prev => prev.filter(item => item._id !== id));
-      alert('Backend offline: Removed image from frontend memory.');
+      console.error('Failed to remove item from localStorage', err);
     }
+
+    try {
+      await fetch(`${API_URL}/api/gallery/${id}`, {
+        method: 'DELETE'
+      });
+    } catch (err) {
+      console.log('Backend offline; item removed from local storage');
+    }
+
+    await loadGalleryItems();
   };
 
   const clearLocalInquiries = () => {

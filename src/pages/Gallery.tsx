@@ -17,36 +17,77 @@ export const Gallery: React.FC = () => {
 
   useEffect(() => {
     const fetchGallery = async () => {
+      let localItems: GalleryItem[] = [];
+      try {
+        const stored = localStorage.getItem('unity_local_gallery');
+        if (stored) {
+          localItems = JSON.parse(stored);
+        }
+      } catch (err) {
+        console.error('Failed reading local gallery storage', err);
+      }
+
+      let apiItems: GalleryItem[] = [];
       try {
         const res = await fetch(`${API_URL}/api/gallery`);
         if (res.ok) {
           const json = await res.json();
-          if (json.success) {
-            setItems(json.data);
+          if (json.success && Array.isArray(json.data)) {
+            apiItems = json.data;
           }
         }
       } catch (err) {
-        console.log("Backend offline, using fallback data.");
-        setItems([
-          {
-            _id: 'fallback_1',
-            title: "Educational Support Distribution",
-            description: "Providing learning materials and kits to children at community centers.",
-            imageUrl: "/wall1.jpg"
-          },
-          {
-            _id: 'fallback_2',
-            title: "Community Outreach",
-            description: "Helping build robust community operations and supportive networks.",
-            imageUrl: "/mrs.chandni chauhan.jpeg"
-          }
-        ]);
-      } finally {
-        setLoading(false);
+        console.log("Backend offline, relying on local storage & fallback data.");
       }
+
+      const defaultItems: GalleryItem[] = [
+        {
+          _id: 'fallback_1',
+          title: "Educational Support Distribution",
+          description: "Providing learning materials and kits to children at community centers.",
+          imageUrl: "/wall1.jpg"
+        },
+        {
+          _id: 'fallback_2',
+          title: "Community Outreach",
+          description: "Helping build robust community operations and supportive networks.",
+          imageUrl: "/mrs.chandni chauhan.jpeg"
+        }
+      ];
+
+      const combinedMap = new Map<string, GalleryItem>();
+
+      [...localItems, ...apiItems].forEach(item => {
+        const key = item._id || item.imageUrl;
+        if (key && !combinedMap.has(key)) {
+          combinedMap.set(key, item);
+        }
+      });
+
+      if (combinedMap.size === 0) {
+        defaultItems.forEach(item => combinedMap.set(item._id!, item));
+      } else {
+        defaultItems.forEach(item => {
+          if (!combinedMap.has(item._id!) && !Array.from(combinedMap.values()).some(existing => existing.imageUrl === item.imageUrl)) {
+            combinedMap.set(item._id!, item);
+          }
+        });
+      }
+
+      setItems(Array.from(combinedMap.values()));
+      setLoading(false);
     };
 
     fetchGallery();
+
+    const handleUpdate = () => fetchGallery();
+    window.addEventListener('unity_gallery_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+
+    return () => {
+      window.removeEventListener('unity_gallery_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, []);
 
   return (
