@@ -95,8 +95,7 @@ button, .btn {
 
 .btn-primary:hover {
   background-color: var(--primary-light);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(12, 35, 64, 0.3);
+  box-shadow: 0 6px 16px rgba(12, 35, 64, 0.35);
 }
 
 .btn-secondary {
@@ -107,8 +106,7 @@ button, .btn {
 
 .btn-secondary:hover {
   background-color: var(--secondary-light);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(217, 155, 38, 0.3);
+  box-shadow: 0 6px 16px rgba(217, 155, 38, 0.35);
 }
 
 .btn-outline {
@@ -120,7 +118,6 @@ button, .btn {
 .btn-outline:hover {
   background-color: var(--primary);
   color: var(--text-white);
-  transform: translateY(-2px);
 }
 
 .btn-white {
@@ -131,7 +128,6 @@ button, .btn {
 
 .btn-white:hover {
   background-color: var(--bg-secondary);
-  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 

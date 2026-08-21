@@ -1417,16 +1417,21 @@ export const AdminDemo: React.FC = () => {
           border-radius: var(--radius-sm);
           background-color: var(--bg-secondary);
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
           color: var(--text-secondary);
           font-weight: 600;
           font-size: 0.9rem;
+          overflow: hidden;
+        }
+
+        .file-input-wrapper > *:not(.file-input-hidden) {
+          pointer-events: none;
         }
 
         .file-input-wrapper:hover {
           border-color: var(--primary);
           color: var(--primary);
-          background-color: rgba(12, 35, 64, 0.02);
+          background-color: rgba(12, 35, 64, 0.04);
         }
 
         .file-input-hidden {
@@ -1437,6 +1442,7 @@ export const AdminDemo: React.FC = () => {
           height: 100%;
           opacity: 0;
           cursor: pointer;
+          z-index: 5;
         }
 
         .photo-preview-container {
@@ -1494,6 +1500,24 @@ export const AdminDemo: React.FC = () => {
         /* Employee Directory Card Display */
         .btn-refresh-list {
           padding: 8px;
+          width: 36px;
+          height: 36px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: var(--radius-sm);
+          transform: none !important;
+          transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .btn-refresh-list > * {
+          pointer-events: none;
+        }
+
+        .btn-refresh-list:hover {
+          transform: none !important;
+          background-color: var(--primary);
+          color: var(--text-white);
         }
 
         .error-list-box, .empty-list-box {
