@@ -64,14 +64,9 @@ export const Gallery: React.FC = () => {
         }
       });
 
+      // Only show default fallback photos if NO uploaded images exist at all
       if (combinedMap.size === 0) {
         defaultItems.forEach(item => combinedMap.set(item._id!, item));
-      } else {
-        defaultItems.forEach(item => {
-          if (!combinedMap.has(item._id!) && !Array.from(combinedMap.values()).some(existing => existing.imageUrl === item.imageUrl)) {
-            combinedMap.set(item._id!, item);
-          }
-        });
       }
 
       setItems(Array.from(combinedMap.values()));
